@@ -40,7 +40,8 @@ document.getElementById('check').addEventListener('click', async () => {
     'tailwind': 'Tailwind CSS',
     'jquery': 'jQuery',
     'angular': 'Angular',
-    'fontAwesome': 'Font Awesome'
+    'fontAwesome': 'Font Awesome',
+    'webgl': 'WebGL'
   };
 
   // Reset results
@@ -105,7 +106,14 @@ document.getElementById('check').addEventListener('click', async () => {
       fontAwesome: (html) => 
         html.includes('font-awesome') ||
         html.includes('fontawesome') ||
-        html.includes('fa-')
+        html.includes('fa-'),
+
+      webgl: (html) => 
+        html.includes('webgl') ||
+        html.includes('three.js') ||
+        html.includes('babylon.js') ||
+        html.includes('gl-matrix.js') ||
+        html.includes('canvas.getcontext("webgl')
     };
 
     // Perform detection
