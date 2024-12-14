@@ -32,6 +32,17 @@ document.getElementById('check').addEventListener('click', async () => {
   const library = document.getElementById('library').value;
   const resultsDiv = document.getElementById('results');
 
+  // Mapping of library variable names to full names
+  const libraryFullNames = {
+    'bootstrap': 'Bootstrap',
+    'vue': 'Vue.js',
+    'react': 'React',
+    'tailwind': 'Tailwind CSS',
+    'jquery': 'jQuery',
+    'angular': 'Angular',
+    'fontAwesome': 'Font Awesome'
+  };
+
   // Reset results
   resultsDiv.textContent = 'Checking...';
   resultsDiv.className = 'results';
@@ -100,11 +111,14 @@ document.getElementById('check').addEventListener('click', async () => {
     // Perform detection
     const result = detectionMethods[library](html.toLowerCase());
 
+    // Get the full library name, defaulting to the original library name if not found
+    const fullLibraryName = libraryFullNames[library] || library;
+
     if (result) {
-      resultsDiv.textContent = `✅ ${library} detected on ${url}`;
+      resultsDiv.textContent = `✅ ${fullLibraryName} detected.`;
       resultsDiv.classList.add('success');
     } else {
-      resultsDiv.textContent = `❌ ${library} not detected on ${url}`;
+      resultsDiv.textContent = `❌ ${fullLibraryName} not detected.`;
       resultsDiv.classList.add('error');
     }
 
