@@ -1,0 +1,200 @@
+:root {
+  /* Light Theme Colors */
+  --background-color-light: #f4f4f7;
+  --card-background-light: #ffffff;
+  --text-color-light: #333333;
+  --input-background-light: #f9f9fc;
+  --input-border-light: #e0e0e0;
+  --button-background-light: #007bff;
+  --button-hover-light: #0056b3;
+
+  /* Dark Theme Colors */
+  --background-color-dark: #121212;
+  --card-background-dark: #1e1e1e;
+  --text-color-dark: #e0e0e0;
+  --input-background-dark: #2c2c2c;
+  --input-border-dark: #444444;
+  --button-background-dark: #4a90e2;
+  --button-hover-dark: #6ab0ff;
+
+  /* Default to Light Theme */
+  --background-color: var(--background-color-light);
+  --card-background: var(--card-background-light);
+  --text-color: var(--text-color-light);
+  --input-background: var(--input-background-light);
+  --input-border: var(--input-border-light);
+  --button-background: var(--button-background-light);
+  --button-hover: var(--button-hover-light);
+}
+
+/* Dark Theme */
+.dark-theme {
+  --background-color: var(--background-color-dark);
+  --card-background: var(--card-background-dark);
+  --text-color: var(--text-color-dark);
+  --input-background: var(--input-background-dark);
+  --input-border: var(--input-border-dark);
+  --button-background: var(--button-background-dark);
+  --button-hover: var(--button-hover-dark);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Helvetica', Arial, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  line-height: 1.6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.container {
+  background-color: var(--card-background);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  padding: 30px;
+  width: 100%;
+  max-width: 500px;
+  transition: background-color 0.3s;
+  position: relative;
+}
+
+h1 {
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 25px;
+  color: var(--text-color);
+}
+
+/* Theme Toggle Styles */
+.theme-toggle-container {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+.theme-toggle-checkbox {
+  display: none;
+}
+
+.theme-toggle-label {
+  display: block;
+  width: 60px;
+  height: 30px;
+  background-color: #e0e0e0;
+  border-radius: 15px;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.theme-toggle-inner {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  right: 3px;
+  bottom: 3px;
+}
+
+.theme-toggle-sun, 
+.theme-toggle-moon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #333;
+  font-size: 16px;
+  transition: opacity 0.3s;
+}
+
+.theme-toggle-sun {
+  left: 5px;
+}
+
+.theme-toggle-moon {
+  right: 5px;
+}
+
+.theme-toggle-switch {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 26px;
+  height: 26px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.theme-toggle-checkbox:checked + .theme-toggle-label {
+  background-color: #4a90e2;
+}
+
+.theme-toggle-checkbox:checked + .theme-toggle-label .theme-toggle-switch {
+  transform: translateX(30px);
+}
+
+.theme-toggle-checkbox:checked + .theme-toggle-label .theme-toggle-sun {
+  opacity: 0.3;
+}
+
+.theme-toggle-checkbox:checked + .theme-toggle-label .theme-toggle-moon {
+  opacity: 1;
+}
+
+input, select {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  background-color: var(--input-background);
+  color: var(--text-color);
+  transition: border-color 0.3s, background-color 0.3s;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--button-background);
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--button-background);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: var(--button-hover);
+}
+
+.results {
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 8px;
+  background-color: var(--input-background);
+  word-wrap: break-word;
+  text-align: center;
+}
+
+.error {
+  color: #dc3545;
+}
+
+.success {
+  color: #28a745;
+}
