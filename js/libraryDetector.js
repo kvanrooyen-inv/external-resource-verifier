@@ -67,11 +67,14 @@ document.getElementById('check').addEventListener('click', async () => {
         html.includes('vue.min.js') || 
         html.includes('Vue.js') ||
         html.includes('vue-router') ||
-        html.includes('vuex'),
+        html.includes('vuex') ||
+        html.includes('vue.global.js'),
 
       react: (html) => 
         html.includes('react.js') ||
         html.includes('react.production.min.js') ||
+        html.includes('react.development.js') ||
+        html.includes('react-dom.development.js') ||
         html.includes('react-dom.js'),
 
       tailwind: (html) => 
