@@ -3,29 +3,43 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Advanced Library Detector</title>
+  <title>Library Detector</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <h1>Library Detector</h1>
-  <input 
-    type="text" 
-    id="url" 
-    placeholder="Enter website URL (e.g., https://example.com)"
-  >
-  <select id="library">
-    <option value="bootstrap">Bootstrap</option>
-    <option value="vue">Vue.js</option>
-    <option value="react">React</option>
-    <option value="tailwind">Tailwind CSS</option>
-    <option value="jquery">jQuery</option>
-    <option value="angular">Angular</option>
-    <option value="fontAwesome">Font Awesome</option>
-  </select>
-  <button id="check">Detect Library</button>
-  <div id="results" class="results">
-    Results will appear here...
+  <div class="container">
+    <div class="theme-toggle-container">
+      <input type="checkbox" id="theme-toggle" class="theme-toggle-checkbox">
+      <label for="theme-toggle" class="theme-toggle-label">
+        <span class="theme-toggle-inner">
+          <span class="theme-toggle-sun"><i class="fas fa-sun"></i></span>
+          <span class="theme-toggle-moon"><i class="fas fa-moon"></i></span>
+        </span>
+        <span class="theme-toggle-switch"></span>
+      </label>
+    </div>
+    <h1>Library Detector</h1>
+    <input 
+      type="text" 
+      id="url" 
+      placeholder="Enter website URL (e.g., https://example.com)"
+    >
+    <select id="library">
+      <option value="bootstrap">Bootstrap</option>
+      <option value="vue">Vue.js</option>
+      <option value="react">React</option>
+      <option value="tailwind">Tailwind CSS</option>
+      <option value="jquery">jQuery</option>
+      <option value="angular">Angular</option>
+      <option value="fontAwesome">Font Awesome</option>
+    </select>
+    <button id="check">Detect Library</button>
+    <div id="results" class="results">
+      Results will appear here...
+    </div>
   </div>
+
   <script src="js/libraryDetector.js"></script>
 </body>
 </html>
