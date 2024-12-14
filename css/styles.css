@@ -144,6 +144,14 @@ body {
   transition: background-color 0.3s;
 }
 
+.subtitle {
+  text-align: center;
+  color: var(--text-color);
+  opacity: 0.7;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+}
+
 /* Mobile Responsiveness - Removes Card Design */
 @media screen and (max-width: 600px) {
   body {
