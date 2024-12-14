@@ -1,0 +1,26 @@
+body {
+  font-family: Arial, sans-serif;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  line-height: 1.6;
+  }
+input, select, button {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  box-sizing: border-box;
+  }
+.results {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f4f4f4;
+  border-radius: 5px;
+  word-wrap: break-word;
+  }
+.error {
+  color: red;
+  }
+.success {
+  color: green;
+  }
