@@ -123,10 +123,10 @@ document.getElementById('check').addEventListener('click', async () => {
     const fullLibraryName = libraryFullNames[library] || library;
 
     if (result) {
-      resultsDiv.textContent = `✅ ${fullLibraryName} detected.`;
+      resultsDiv.innerHTML = `✅ <a href="${url}" target="_blank">${fullLibraryName} detected</a>`;
       resultsDiv.classList.add('success');
     } else {
-      resultsDiv.textContent = `❌ ${fullLibraryName} not detected.`;
+      resultsDiv.innerHTML = `❌ <a href="${url}" target="_blank">${fullLibraryName} not detected</a>`;
       resultsDiv.classList.add('error');
     }
 
