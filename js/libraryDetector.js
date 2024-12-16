@@ -2,7 +2,6 @@
 const themeToggle = document.getElementById('theme-toggle');
 const body = document.body;
 
-// Load saved theme from localStorage
 function loadTheme() {
   const savedTheme = localStorage.getItem('theme');
   if (savedTheme === 'dark') {
@@ -11,19 +10,13 @@ function loadTheme() {
   }
 }
 
-// Toggle theme
 function toggleTheme() {
   body.classList.toggle('dark-theme');
-  
-  // Save theme preference
   const isDarkTheme = body.classList.contains('dark-theme');
   localStorage.setItem('theme', isDarkTheme ? 'dark' : 'light');
 }
 
-// Event listener for theme toggle
 themeToggle.addEventListener('change', toggleTheme);
-
-// Load theme on page load
 loadTheme();
 
 // Library Detection Logic
@@ -31,8 +24,17 @@ document.getElementById('check').addEventListener('click', async () => {
   const url = document.getElementById('url').value;
   const library = document.getElementById('library').value;
   const resultsDiv = document.getElementById('results');
+  const detailsToggle = document.getElementById('details-toggle');
+  const detailsContainer = document.getElementById('details-container');
+  const detailsContent = document.getElementById('details-content');
 
-  // Mapping of library variable names to full names
+  // Reset state
+  resultsDiv.textContent = 'Checking...';
+  resultsDiv.className = 'results';
+  detailsToggle.style.display = 'none';
+  detailsContainer.style.display = 'none';
+  detailsContent.textContent = '';
+
   const libraryFullNames = {
     'bootstrap': 'Bootstrap',
     'vue': 'Vue.js',
@@ -44,11 +46,6 @@ document.getElementById('check').addEventListener('click', async () => {
     'webgl': 'WebGL'
   };
 
-  // Reset results
-  resultsDiv.textContent = 'Checking...';
-  resultsDiv.className = 'results';
-
-  // Basic URL validation
   if (!url.startsWith('http://') && !url.startsWith('https://')) {
     resultsDiv.textContent = 'Please enter a valid URL starting with http:// or https://';
     resultsDiv.classList.add('error');
@@ -56,75 +53,87 @@ document.getElementById('check').addEventListener('click', async () => {
   }
 
   try {
-    // Using a fetch request without proxy to avoid CORS issues
     const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
     const data = await response.json();
-    
-    // Check if request was successful
+
     if (!data.contents) {
       throw new Error('Could not retrieve page contents');
     }
 
     const html = data.contents;
 
-    // Library detection functions
     const detectionMethods = {
-      bootstrap: (html) => 
-        html.includes('bootstrap.css') || 
-        html.includes('bootstrap.min.css') ||
-        html.includes('cdn.jsdelivr.net/npm/bootstrap'),
-
-      vue: (html) => 
-        html.includes('vue.js') || 
-        html.includes('vue.min.js') || 
-        html.includes('Vue.js') ||
-        html.includes('vue-router') ||
-        html.includes('vuex') ||
-        html.includes('vue.global.js'),
-
-      react: (html) => 
-        html.includes('react.js') ||
-        html.includes('react.production.min.js') ||
-        html.includes('react.development.js') ||
-        html.includes('react-dom.development.js') ||
-        html.includes('react-dom.js'),
-
-      tailwind: (html) => 
-        html.includes('tailwind.css') ||
-        html.includes('tailwindcss') ||
-        html.includes('cdn.tailwindcss.com'),
-
-      jquery: (html) => 
-        html.includes('jquery.js') ||
-        html.includes('jquery.min.js'),
-
-      angular: (html) => 
-        html.includes('angular.js') ||
-        html.includes('angular.min.js') ||
-        html.includes('@angular/core'),
-
-      fontAwesome: (html) => 
-        html.includes('font-awesome') ||
-        html.includes('fontawesome') ||
-        html.includes('fa-'),
-
-      webgl: (html) => 
-        html.includes('webgl') ||
-        html.includes('three.js') ||
-        html.includes('babylon.js') ||
-        html.includes('gl-matrix.js') ||
-        html.includes('canvas.getcontext("webgl')
+      bootstrap: (htmlStr) => htmlStr.split('\n').filter(line =>
+        line.toLowerCase().includes('bootstrap.css') ||
+        line.toLowerCase().includes('bootstrap.min.css') ||
+        line.toLowerCase().includes('cdn.jsdelivr.net/npm/bootstrap')
+      ),
+      vue: (htmlStr) => htmlStr.split('\n').filter(line =>
+        line.toLowerCase().includes('vue.js') ||
+        line.toLowerCase().includes('vue.min.js') ||
+        line.toLowerCase().includes('vue-router') ||
+        line.toLowerCase().includes('vuex') ||
+        line.toLowerCase().includes('vue.global.js')
+      ),
+      react: (htmlStr) => htmlStr.split('\n').filter(line =>
+        line.toLowerCase().includes('react.js') ||
+        line.toLowerCase().includes('react.production.min.js') ||
+        line.toLowerCase().includes('react.development.js') ||
+        line.toLowerCase().includes('react-dom.development.js') ||
+        line.toLowerCase().includes('react-dom.js')
+      ),
+      tailwind: (htmlStr) => htmlStr.split('\n').filter(line =>
+        line.toLowerCase().includes('tailwind.css') ||
+        line.toLowerCase().includes('tailwindcss') ||
+        line.toLowerCase().includes('cdn.tailwindcss.com')
+      ),
+      jquery: (htmlStr) => htmlStr.split('\n').filter(line =>
+        line.toLowerCase().includes('jquery.js') ||
+        line.toLowerCase().includes('jquery.min.js')
+      ),
+      angular: (htmlStr) => htmlStr.split('\n').filter(line =>
+        line.toLowerCase().includes('angular.js') ||
+        line.toLowerCase().includes('angular.min.js') ||
+        line.toLowerCase().includes('@angular/core')
+      ),
+      fontAwesome: (htmlStr) => htmlStr.split('\n').filter(line =>
+        line.toLowerCase().includes('font-awesome') ||
+        line.toLowerCase().includes('fontawesome') ||
+        line.toLowerCase().includes('fa-')
+      ),
+      webgl: (htmlStr) => htmlStr.split('\n').filter(line =>
+        line.toLowerCase().includes('webgl') ||
+        line.toLowerCase().includes('three.js') ||
+        line.toLowerCase().includes('babylon.js') ||
+        line.toLowerCase().includes('gl-matrix.js') ||
+        line.toLowerCase().includes('canvas.getcontext("webgl")')
+      )
     };
 
-    // Perform detection
-    const result = detectionMethods[library](html.toLowerCase());
-
-    // Get the full library name, defaulting to the original library name if not found
     const fullLibraryName = libraryFullNames[library] || library;
+    const result = detectionMethods[library](html);
 
-    if (result) {
+    if (result && result.length > 0) {
       resultsDiv.innerHTML = `✅ <a href="${url}" target="_blank">${fullLibraryName} detected</a>`;
       resultsDiv.classList.add('success');
+      detailsToggle.style.display = 'inline-block';
+
+      // Remove leading spaces/tabs from each line
+      const trimmedLines = result.map(line => line.trimStart());
+      detailsContent.textContent = trimmedLines.join('\n');
+
+      // Automatically detect language and highlight
+      hljs.highlightElement(detailsContent);
+
+      detailsToggle.onclick = () => {
+        if (detailsContainer.style.display === 'none') {
+          detailsContainer.style.display = 'block';
+          detailsToggle.innerHTML = '<i class="fas fa-chevron-up"></i>';
+        } else {
+          detailsContainer.style.display = 'none';
+          detailsToggle.innerHTML = '<i class="fas fa-chevron-down"></i>';
+        }
+      };
     } else {
       resultsDiv.innerHTML = `❌ <a href="${url}" target="_blank">${fullLibraryName} not detected</a>`;
       resultsDiv.classList.add('error');
@@ -136,3 +145,4 @@ document.getElementById('check').addEventListener('click', async () => {
     resultsDiv.classList.add('error');
   }
 });
+
