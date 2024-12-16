@@ -150,7 +150,7 @@ body {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   padding: 30px;
   width: 100%;
-  max-width: 500px;
+  max-width: 600px;
   transition: background-color 0.3s;
 }
 
