@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>External Resource Checker</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Using Obsidian theme for Highlight.js -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/obsidian.min.css">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -38,11 +40,20 @@
       <option value="webgl">WebGL</option>
     </select>
     <button id="check">Verify</button>
-    <div id="results" class="results">
-      Results will appear here...
+
+    <div class="results-container">
+      <div id="results" class="results">Results will appear here...</div>
+      <div id="details-toggle" class="details-toggle" style="display: none;">
+        <i class="fas fa-chevron-down"></i>
+      </div>
+    </div>
+    <div id="details-container" class="details-container" style="display: none;">
+      <pre><code id="details-content"></code></pre>
     </div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
   <script src="js/libraryDetector.js"></script>
 </body>
 </html>
+

@@ -67,7 +67,7 @@ body {
   text-decoration: none;
 }
 
-/* Theme Toggle Styles - Moved Outside of Container */
+/* Theme Toggle Styles */
 .theme-toggle-container {
   position: fixed;
   top: 20px;
@@ -162,7 +162,6 @@ body {
   font-size: 0.9rem;
 }
 
-/* Mobile Responsiveness - Removes Card Design */
 @media screen and (max-width: 600px) {
   body {
     padding: 10px;
@@ -220,19 +219,62 @@ button:hover {
   background-color: var(--button-hover);
 }
 
-.results {
-  margin-top: 20px;
-  padding: 15px;
-  border-radius: 8px;
+.results-container {
+  position: relative;
   background-color: var(--input-background);
+  border-radius: 8px;
+  margin-top: 20px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;       
+  justify-content: space-between;
+  padding: 0 15px;
+}
+
+.results {
+  padding: 15px 0;
   word-wrap: break-word;
-  text-align: center;
+  text-align: left;
+  flex: 1;
+}
+
+/* Success/Error colors */
+.success {
+  color: #28a745;
 }
 
 .error {
   color: #dc3545;
 }
 
-.success {
-  color: #28a745;
+.details-toggle {
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.3s;
 }
+
+.details-toggle:hover {
+  opacity: 1;
+}
+
+.details-container {
+  background-color: rgba(0,0,0,0.05);
+  display: none;
+  margin-top: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.details-container pre {
+  background-color: transparent !important;
+  border-radius: 8px;
+  white-space: pre;
+  word-break: normal;
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
+}
+
+/* Highlight.js Obsidian theme adjustments are already included via CDN */
+
