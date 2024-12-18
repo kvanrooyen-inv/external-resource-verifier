@@ -73,24 +73,36 @@ const StandardUI = () => {
     }
   }
 
-  const handleVerify = async () => {
-    setError('');
-    setLibraries([]);
-    setExpanded({});
-    setSearched(false);
-    setCopied(false);
+const handleVerify = async () => {
+  setError('');
+  setLibraries([]);
+  setExpanded({});
+  setSearched(false);
+  setCopied(false);
 
-    if (!isValidURL(url)) {
-      setError('Please enter a valid URL.');
-      return;
-    }
+  if (!isValidURL(url)) {
+    setError('Please enter a valid URL.');
+    return;
+  }
 
   setLoading(true);
   try {
     // Use Netlify Function endpoint
     const res = await fetch(`/.netlify/functions/fetch-url?url=${encodeURIComponent(url)}`);
+    
+    // Check if the response is ok
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`HTTP error! status: ${res.status}, message: ${errorText}`);
+    }
+    
     const data = await res.json();
     
+    // Additional check for contents
+    if (!data || !data.contents) {
+      throw new Error('No content received from the URL');
+    }
+
     const html = data.contents;
 
     const detected = Object.entries(LIBRARY_DETECTION_METHODS).reduce((acc, [libName, detector]) => {
@@ -99,17 +111,17 @@ const StandardUI = () => {
         acc.push({ name: libName, lines });
       }
       return acc;
-    }, []);      setLibraries(detected);
-    } catch (e) {
-      console.error(e);
-      setError('There was an error fetching or processing the provided URL.');
-    } finally {
-      setLoading(false);
-      setSearched(true);
-    }
-  };
+    }, []);
 
-  const toggleExpand = (libraryName) => {
+    setLibraries(detected);
+  } catch (e) {
+    console.error('Verification error:', e);
+    setError(e.message || 'There was an error fetching or processing the provided URL.');
+  } finally {
+    setLoading(false);
+    setSearched(true);
+  }
+};  const toggleExpand = (libraryName) => {
     setExpanded((prev) => ({ ...prev, [libraryName]: !prev[libraryName] }));
   };
 
