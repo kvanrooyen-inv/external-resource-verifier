@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Light Theme Colors */
+  --background-color-light: #f4f4f7;
+  --card-background-light: #ffffff;
+  --text-color-light: #333333;
+  --input-background-light: #f9f9fc;
+  --input-border-light: #e0e0e0;
+  --button-background-light: #007bff;
+  --button-hover-light: #0056b3;
+
+  /* Dark Theme Colors */
+  --background-color-dark: #121212;
+  --card-background-dark: #1e1e1e;
+  --text-color-dark: #e0e0e0;
+  --input-background-dark: #2c2c2c;
+  --input-border-dark: #444444;
+  --button-background-dark: #4a90e2;
+  --button-hover-dark: #6ab0ff;
+
+  /* Default to Light Theme */
+  --background-color: var(--background-color-light);
+  --card-background: var(--card-background-light);
+  --text-color: var(--text-color-light);
+  --input-background: var(--input-background-light);
+  --input-border: var(--input-border-light);
+  --button-background: var(--button-background-light);
+  --button-hover: var(--button-hover-light);
+}
+
+/* Dark Theme */
+.dark {
+  --background-color: var(--background-color-dark);
+  --card-background: var(--card-background-dark);
+  --text-color: var(--text-color-dark);
+  --input-background: var(--input-background-dark);
+  --input-border: var(--input-border-dark);
+  --button-background: var(--button-background-dark);
+  --button-hover: var(--button-hover-dark);
+}
