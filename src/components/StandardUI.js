@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
-// Detection methods adapted to React - identical logic as provided
 const LIBRARY_DETECTION_METHODS = {
   bootstrap: (htmlStr) => htmlStr.split('\n').filter(line =>
     line.toLowerCase().includes('bootstrap.css') ||
@@ -55,10 +56,10 @@ const LIBRARY_DETECTION_METHODS = {
 
 const StandardUI = () => {
   const [url, setUrl] = useState('');
-  const [libraries, setLibraries] = useState([]); // Array of { name: string, lines: string[] }
+  const [libraries, setLibraries] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [expanded, setExpanded] = useState({}); // Track expanded state of each library card
+  const [expanded, setExpanded] = useState({});
   const [searched, setSearched] = useState(false);
 
   const isValidURL = (input) => {
@@ -89,7 +90,6 @@ const StandardUI = () => {
       }
       const html = await res.text();
 
-      // Detect libraries
       const detected = Object.entries(LIBRARY_DETECTION_METHODS).reduce((acc, [libName, detector]) => {
         const lines = detector(html);
         if (lines.length > 0) {
@@ -110,6 +110,11 @@ const StandardUI = () => {
 
   const toggleExpand = (libraryName) => {
     setExpanded((prev) => ({ ...prev, [libraryName]: !prev[libraryName] }));
+  };
+
+  const getLanguage = (libName) => {
+    // Only webgl uses JS syntax highlighting; all others use HTML
+    return libName === 'webgl' ? 'javascript' : 'html';
   };
 
   return (
@@ -141,33 +146,48 @@ const StandardUI = () => {
               {loading ? 'Verifying...' : 'Verify'}
             </Button>
 
-            {/* Display results */}
-            {(!loading && searched && libraries.length === 0 && !error && url) && (
+            {(!loading && searched && libraries.length === 0 && !error) && (
               <div className="text-center text-slate-700 dark:text-zinc-300 mt-4">
                 ❌ No libraries detected
               </div>
             )}
 
-            {libraries.map((lib, index) => (
-              <Card key={index} className="mt-4">
-                <CardContent className="flex justify-between items-center p-4">
-                  <div className="flex items-center text-slate-900 dark:text-zinc-100">
-                    ✅ <span className="ml-2 capitalize">{lib.name}</span>
-                  </div>
-                  <button
-                    className="text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-zinc-100"
-                    onClick={() => toggleExpand(lib.name)}
-                  >
-                    {expanded[lib.name] ? '▲' : '▼'}
-                  </button>
-                </CardContent>
-                {expanded[lib.name] && (
-                  <pre className="bg-slate-200 dark:bg-zinc-800 p-2 text-sm text-slate-800 dark:text-zinc-200 overflow-auto">
-                    {lib.lines.join('\n')}
-                  </pre>
-                )}
-              </Card>
-            ))}
+            {libraries.map((lib, index) => {
+              // Remove leading whitespace from each line
+              const cleanedLines = lib.lines.map(line => line.trimStart()).join('\n');
+
+              return (
+                <Card key={index} className="mt-4">
+                  <CardContent className="flex justify-between items-center p-4">
+                    <div className="flex items-center text-slate-900 dark:text-zinc-100">
+                      ✅ <span className="ml-2 capitalize">{lib.name}</span>
+                    </div>
+                    <button
+                      className="text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-zinc-100"
+                      onClick={() => toggleExpand(lib.name)}
+                    >
+                      {expanded[lib.name] ? '▲' : '▼'}
+                    </button>
+                  </CardContent>
+                  {expanded[lib.name] && (
+                    <div className="bg-zinc-800 p-2 rounded-b-lg">
+                      <SyntaxHighlighter
+                        language={getLanguage(lib.name)}
+                        style={dracula}
+                        customStyle={{ 
+                          backgroundColor: 'transparent', 
+                          paddingTop: '1em', 
+                          paddingBottom: '1em',
+                          fontSize: '0.875rem' // text-sm
+                        }}
+                      >
+                        {cleanedLines}
+                      </SyntaxHighlighter>
+                    </div>
+                  )}
+                </Card>
+              );
+            })}
           </div>
         </CardContent>
       </Card>
