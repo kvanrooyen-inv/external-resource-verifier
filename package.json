@@ -7,9 +7,11 @@
     "autoprefixer": "^10.4.20",
     "cra-template": "1.2.0",
     "lucide-react": "^0.468.0",
+    "lz-string": "^1.5.0",
     "postcss": "^8.4.49",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-icons": "^5.4.0",
     "react-scripts": "5.0.1",
     "react-syntax-highlighter": "^15.6.1"
   },

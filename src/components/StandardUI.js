@@ -1,9 +1,12 @@
+
 import React, { useState } from 'react';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { compressToEncodedURIComponent } from 'lz-string';
+import { FaShareAlt } from 'react-icons/fa'; // Using react-icons for Font Awesome
 
 const LIBRARY_DETECTION_METHODS = {
   bootstrap: (htmlStr) => htmlStr.split('\n').filter(line =>
@@ -116,26 +119,58 @@ const StandardUI = () => {
     return libName === 'webgl' ? 'javascript' : 'html';
   };
 
+  const handleShare = async () => {
+    const payload = {
+      url,
+      detectedLibraries: libraries.map((lib) => ({
+        name: lib.name,
+        detected: true,
+        line: lib.lines.join('\n')
+      }))
+    };
+
+    const compressed = compressToEncodedURIComponent(JSON.stringify(payload));
+    const shareURL = `${window.location.origin}?share=${compressed}`;
+
+    try {
+      await navigator.clipboard.writeText(shareURL);
+      alert('Share link copied to clipboard!');
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-zinc-950 flex items-center justify-center">
+    <div className="min-h-screen bg-slate-100 dark:bg-zinc-950 flex flex-col items-center justify-center">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-center mb-5 text-2xl">
             External Resource Checker
           </CardTitle>
           <p className="text-center text-sm mb-4 text-slate-600 dark:text-zinc-300">
-            Enter a URL to verify whether or not it uses the requested resource.
+            Enter a URL to verify whether it uses certain external resources.
           </p>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <Input
-              type="url"
-              placeholder="Enter URL"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              className="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-zinc-100 placeholder-slate-500 dark:placeholder-zinc-400"
-            />
+            <div className="flex items-center space-x-2">
+              <Input
+                type="url"
+                placeholder="Enter URL"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                className="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-zinc-100 placeholder-slate-500 dark:placeholder-zinc-400"
+              />
+              {libraries.length > 0 && (
+                <button
+                  onClick={handleShare}
+                  className="text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-zinc-100 text-sm"
+                  title="Share Results"
+                >
+                  <FaShareAlt />
+                </button>
+              )}
+            </div>
             {error && <p className="text-red-500 text-sm">{error}</p>}
             <Button
               onClick={handleVerify}
