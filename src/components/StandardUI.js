@@ -44,8 +44,7 @@ const LIBRARY_DETECTION_METHODS = {
   ),
   fontAwesome: (htmlStr) => htmlStr.split('\n').filter(line =>
     line.toLowerCase().includes('font-awesome') ||
-    line.toLowerCase().includes('fontawesome') ||
-    line.toLowerCase().includes('fa-')
+    line.toLowerCase().includes('fontawesome')
   ),
   webgl: (htmlStr) => htmlStr.split('\n').filter(line =>
     line.toLowerCase().includes('webgl') ||
@@ -72,7 +71,7 @@ const StandardUI = () => {
     } catch (_) {
       return false;
     }
-  };
+  }
 
   const handleVerify = async () => {
     setError('');
@@ -86,23 +85,21 @@ const StandardUI = () => {
       return;
     }
 
-    setLoading(true);
-    try {
-      const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
-      if (!res.ok) {
-        throw new Error(`Error fetching URL. Status: ${res.status}`);
+  setLoading(true);
+  try {
+    // Use Netlify Function endpoint
+    const res = await fetch(`/.netlify/functions/fetch-url?url=${encodeURIComponent(url)}`);
+    const data = await res.json();
+    
+    const html = data.contents;
+
+    const detected = Object.entries(LIBRARY_DETECTION_METHODS).reduce((acc, [libName, detector]) => {
+      const lines = detector(html);
+      if (lines.length > 0) {
+        acc.push({ name: libName, lines });
       }
-      const html = await res.text();
-
-      const detected = Object.entries(LIBRARY_DETECTION_METHODS).reduce((acc, [libName, detector]) => {
-        const lines = detector(html);
-        if (lines.length > 0) {
-          acc.push({ name: libName, lines });
-        }
-        return acc;
-      }, []);
-
-      setLibraries(detected);
+      return acc;
+    }, []);      setLibraries(detected);
     } catch (e) {
       console.error(e);
       setError('There was an error fetching or processing the provided URL.');
