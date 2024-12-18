@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -63,6 +63,7 @@ const StandardUI = () => {
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState({});
   const [searched, setSearched] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const isValidURL = (input) => {
     try {
@@ -78,6 +79,7 @@ const StandardUI = () => {
     setLibraries([]);
     setExpanded({});
     setSearched(false);
+    setCopied(false);
 
     if (!isValidURL(url)) {
       setError('Please enter a valid URL.');
@@ -134,14 +136,27 @@ const StandardUI = () => {
 
     try {
       await navigator.clipboard.writeText(shareURL);
-      alert('Share link copied to clipboard!');
+      setCopied(true); 
     } catch (err) {
       console.error('Failed to copy: ', err);
     }
   };
 
+   // Hide the copied message after 2 seconds
+  useEffect(() => {
+    if (copied) {
+      const timer = setTimeout(() => setCopied(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [copied]);
+
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-zinc-950 flex flex-col items-center justify-center">
+        {copied && (
+        <div className="absolute top-4 bg-gray-800 text-gray-100 px-4 py-2 rounded-md shadow-md text-sm">
+          Share link copied!
+        </div>
+      )}
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-center mb-5 text-2xl">
