@@ -140,7 +140,7 @@ const StandardUI = () => {
             {error && <p className="text-red-500 text-sm">{error}</p>}
             <Button
               onClick={handleVerify}
-              className="w-full bg-slate-800 text-slate-50 hover:bg-slate-900 dark:bg-zinc-800 dark:hover:bg-zinc-700"
+              className="w-full text-slate-50 hover:bg-slate-900"
               disabled={loading}
             >
               {loading ? 'Verifying...' : 'Verify'}
