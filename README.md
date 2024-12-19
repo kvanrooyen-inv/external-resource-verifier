@@ -29,7 +29,7 @@ The tool checks for the following external resources:
 
 ## How to Use
 
-1. Access the tool through the internal network
+1. Access [the tool](https://external-resource-checker.netlify.app/) via your browser
 2. Paste the URL of the page you need to review
 3. Click "Verify" to scan the page
 4. Review the results showing:
