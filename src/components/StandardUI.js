@@ -89,12 +89,19 @@ const StandardUI = () => {
     setLoading(true);
     try {
       const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
-      if (!res.ok) {
-        throw new Error(`Error fetching URL. Status: ${res.status}`);
-      }
       const data = await res.json();
-      const html = data.contents;
 
+      // Check for CORS proxy errors
+      if (!res.ok || (data.status && data.status.http_code >= 400)) {
+        throw new Error('CORS_ERROR');
+      }
+
+      // Check if we actually got HTML content
+      if (!data.contents || typeof data.contents !== 'string' || data.contents.includes('<?xml')) {
+        throw new Error('INVALID_RESPONSE');
+      }
+
+      const html = data.contents;
       const detected = Object.entries(LIBRARY_DETECTION_METHODS).reduce((acc, [libName, detector]) => {
         const lines = detector(html);
         if (lines.length > 0) {
@@ -104,12 +111,17 @@ const StandardUI = () => {
       }, []);
 
       setLibraries(detected);
+      setSearched(true);
     } catch (e) {
       console.error(e);
-      setError('There was an error fetching or processing the provided URL.');
+      if (e.message === 'CORS_ERROR' || e.message === 'INVALID_RESPONSE') {
+        setError('Unable to scrape website data. Please try again later.');
+      } else {
+        setError('There was an error fetching or processing the provided URL.');
+      }
+      setSearched(false);
     } finally {
       setLoading(false);
-      setSearched(true);
     }
   };
 
