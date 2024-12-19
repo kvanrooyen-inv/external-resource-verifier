@@ -92,7 +92,8 @@ const StandardUI = () => {
       if (!res.ok) {
         throw new Error(`Error fetching URL. Status: ${res.status}`);
       }
-      const html = await res.text();
+      const data = await res.json();
+      const html = data.contents;
 
       const detected = Object.entries(LIBRARY_DETECTION_METHODS).reduce((acc, [libName, detector]) => {
         const lines = detector(html);
