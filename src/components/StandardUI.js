@@ -7,6 +7,10 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { compressToEncodedURIComponent } from 'lz-string';
 import { FaShareAlt } from 'react-icons/fa'; // Using react-icons for Font Awesome
+import data from '@emoji-mart/data'
+import { init } from 'emoji-mart'
+
+init({ data })
 
 const LIBRARY_DETECTION_METHODS = {
   bootstrap: (htmlStr) => htmlStr.split('\n').filter(line =>
@@ -208,8 +212,9 @@ const StandardUI = () => {
             </Button>
 
             {(!loading && searched && libraries.length === 0 && !error) && (
-              <div className="text-center text-[#d20f39] dark:text-[#f38ba8] mt-4">
-                ❌ No libraries detected
+              <div className="text-center text-[#d20f39] dark:text-[#f38ba8] mt-4 flex items-center justify-center">
+                <em-emoji shortcodes=":x:" set="apple" size="1em"></em-emoji>
+                <span className="ml-2 mt-1">No libraries detected</span>
               </div>
             )}
 
@@ -221,8 +226,10 @@ const StandardUI = () => {
                 <Card key={index} className="mt-4">
                   <CardContent className="flex justify-between items-center p-4">
                     <div className="flex items-center font-bold">
-                      <span className="text-[#40a02b] dark:text-[#a6e3a1]">✅</span>
-                      <span className="ml-2 capitalize text-[#4c4f69] dark:text-[#cdd6f4]">{lib.name}</span>
+                      <span className="text-[#40a02b] dark:text-[#a6e3a1]">
+                        <em-emoji shortcodes=":white_check_mark:" set="apple"></em-emoji>
+                      </span>
+                      <span className="mt-1 ml-2 capitalize text-[#1e1e2e] dark:text-[#cdd6f4] opacity-100">{lib.name}</span>
                     </div>
                     <button
                       className="text-[#4c4f69] dark:text-[#cdd6f4] hover:text-[#1e66f5] dark:hover:text-[#89b4fa]"

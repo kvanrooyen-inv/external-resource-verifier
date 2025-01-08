@@ -53,8 +53,8 @@ const ShareUI = ({ url, detectedLibraries }) => {
                 <Card key={index}>
                   <CardContent className="flex justify-between items-center p-4 text-[#4c4f69] dark:text-[#cdd6f4] font-bold">
                     <div className="flex items-center">
-                      {lib.detected ? '✅' : '❌'}
-                      <span className="ml-2 capitalize">{lib.name}</span>
+                      {lib.detected ?  <em-emoji shortcodes=":white_check_mark:" set="apple"></em-emoji> : <em-emoji shortcodes=":x:" set="apple" size="1em"></em-emoji>}
+                      <span className="ml-2 mt-1 capitalize">{lib.name}</span>
                     </div>
                     {lib.detected}
                   </CardContent>
