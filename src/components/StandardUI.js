@@ -164,9 +164,9 @@ const StandardUI = () => {
   }, [copied]);
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-zinc-950 flex flex-col items-center justify-center">
+    <div className="min-h-screen bg-[#e6e9ef] dark:bg-[#1e1e2e] flex flex-col items-center justify-center">
         {copied && (
-        <div className="absolute top-4 bg-gray-800 text-gray-100 px-4 py-2 rounded-md shadow-md text-sm">
+        <div className="absolute top-4 bg-[#313244] text-[#cdd6f4] px-4 py-2 rounded-md shadow-md text-sm">
           Share link copied!
         </div>
       )}
@@ -175,7 +175,7 @@ const StandardUI = () => {
           <CardTitle className="text-center mb-5 text-2xl">
             External Resource Checker
           </CardTitle>
-          <p className="text-center text-sm mb-4 text-slate-600 dark:text-zinc-300">
+          <p className="text-center text-sm mb-4 text-[#5c5f77] dark:text-[#bac2de]">
             Enter a URL to verify whether it uses certain external resources.
           </p>
         </CardHeader>
@@ -187,19 +187,18 @@ const StandardUI = () => {
                 placeholder="Enter URL"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-zinc-900 border border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-zinc-100 placeholder-slate-500 dark:placeholder-zinc-400"
               />
               {libraries.length > 0 && (
                 <button
                   onClick={handleShare}
-                  className="text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-zinc-100 text-sm"
+                  className="text-[#4c4f69] dark:text-[#cdd6f4] hover:text-[#1e66f5] dark:hover:text-[#89b4fa] text-sm"
                   title="Share Results"
                 >
                   <FaShareAlt />
                 </button>
               )}
             </div>
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+            {error && <p className="text-[#d20f39] dark:text-[#f38ba8] text-sm">{error}</p>}
             <Button
               onClick={handleVerify}
               className="w-full text-slate-50"
@@ -209,7 +208,7 @@ const StandardUI = () => {
             </Button>
 
             {(!loading && searched && libraries.length === 0 && !error) && (
-              <div className="text-center text-slate-700 dark:text-zinc-300 mt-4">
+              <div className="text-center text-[#d20f39] dark:text-[#f38ba8] mt-4">
                 ❌ No libraries detected
               </div>
             )}
@@ -221,24 +220,25 @@ const StandardUI = () => {
               return (
                 <Card key={index} className="mt-4">
                   <CardContent className="flex justify-between items-center p-4">
-                    <div className="flex items-center text-slate-900 dark:text-zinc-100">
-                      ✅ <span className="ml-2 capitalize">{lib.name}</span>
+                    <div className="flex items-center font-bold">
+                      <span className="text-[#40a02b] dark:text-[#a6e3a1]">✅</span>
+                      <span className="ml-2 capitalize text-[#4c4f69] dark:text-[#cdd6f4]">{lib.name}</span>
                     </div>
                     <button
-                      className="text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-zinc-100"
+                      className="text-[#4c4f69] dark:text-[#cdd6f4] hover:text-[#1e66f5] dark:hover:text-[#89b4fa]"
                       onClick={() => toggleExpand(lib.name)}
                     >
                       {expanded[lib.name] ? '▲' : '▼'}
                     </button>
                   </CardContent>
                   {expanded[lib.name] && (
-                    <div className="bg-zinc-800 p-2 rounded-b-lg">
+                    <div className="bg-[#313244] dark:bg-[#11111b] p-2 rounded-b-lg">
                       <SyntaxHighlighter
                         language={getLanguage(lib.name)}
                         style={dracula}
-                        customStyle={{ 
-                          backgroundColor: 'transparent', 
-                          paddingTop: '1em', 
+                        customStyle={{
+                          backgroundColor: 'transparent',
+                          paddingTop: '1em',
                           paddingBottom: '1em',
                           fontSize: '0.875rem' // text-sm
                         }}
