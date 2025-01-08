@@ -19,9 +19,9 @@ const ShareUI = ({ url, detectedLibraries }) => {
 
   const osName = friendlyOSName();
 
-  return (
-    <div className="min-h-screen bg-slate-100 dark:bg-zinc-950 flex items-center justify-center">
-      <Card className="w-full max-w-md">
+   return (
+    <div className="min-h-screen bg-[#e6e9ef] dark:bg-[#1e1e2e] flex items-center justify-center">
+      <Card className="w-full max-w-md bg-[#eff1f5] dark:bg-[#181825] border-[#9ca0b0] dark:border-[#313244]">
         <CardHeader>
           <CardTitle className="text-center text-2xl">
             External Resource Checker
@@ -30,39 +30,36 @@ const ShareUI = ({ url, detectedLibraries }) => {
         <CardContent>
           <div className="space-y-4">
             {/* Information Box */}
-            <div className="bg-slate-50 dark:bg-zinc-900 p-4 rounded-md text-slate-900 dark:text-zinc-100">
+            <div className="bg-[#e6e9ef] dark:bg-[#313244] p-4 rounded-md text-[#4c4f69] dark:text-[#cdd6f4]">
               <p><strong>OS:</strong> {osName}</p>
               <p><strong>Timestamp:</strong> {new Date().toLocaleString()} {Intl.DateTimeFormat().resolvedOptions().timeZone}</p>
-              <p>
-                <strong>URL:</strong>{' '}
-                <a 
-                  href={url} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="text-blue-600 dark:text-blue-400 underline"
+              <p className="flex">
+                <strong className="flex-shrink-0">URL:</strong>{' '}
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#1e66f5] dark:text-[#89b4fa] underline truncate ml-1"
+                  title={url}
                 >
                   {url}
                 </a>
               </p>
-          </div>        
+            </div>
             {/* Detected Libraries */}
             {detectedLibraries.map((lib, index) => {
-            const cleanedLine = lib.line ? lib.line.split('\n').map(l => l.trimStart()).join('\n') : '';
+              const cleanedLine = lib.line ? lib.line.split('\n').map(l => l.trimStart()).join('\n') : '';
               return (
-                <Card key={index} className="mt-4">
-                  <CardContent className="flex justify-between items-center p-4 text-slate-900 dark:text-zinc-100">
+                <Card key={index}>
+                  <CardContent className="flex justify-between items-center p-4 text-[#4c4f69] dark:text-[#cdd6f4] font-bold">
                     <div className="flex items-center">
                       {lib.detected ? '✅' : '❌'}
                       <span className="ml-2 capitalize">{lib.name}</span>
                     </div>
-                    {lib.detected && (
-                      <button className="text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-zinc-100">
-                        ▼
-                      </button>
-                    )}
+                    {lib.detected}
                   </CardContent>
                   {lib.detected && (
-                    <div className="bg-zinc-800 p-2 rounded-b-lg">
+                    <div className="bg-[#313244] dark:bg-[#11111b] p-2 rounded-b-lg">
                       <SyntaxHighlighter
                         language={getLanguage(lib.name)}
                         style={dracula}
@@ -70,7 +67,7 @@ const ShareUI = ({ url, detectedLibraries }) => {
                           backgroundColor: 'transparent',
                           paddingTop: '1em',
                           paddingBottom: '1em',
-                          fontSize: '0.875rem' // text-sm
+                          fontSize: '0.875rem'
                         }}
                       >
                         {cleanedLine}
