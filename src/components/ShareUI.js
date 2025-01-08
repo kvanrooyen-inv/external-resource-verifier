@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -18,6 +18,12 @@ const ShareUI = ({ url, detectedLibraries }) => {
   };
 
   const osName = friendlyOSName();
+  const [expanded, setExpanded] = useState({});
+
+  // Add a toggle function
+  const toggleExpand = (libraryName) => {
+    setExpanded((prev) => ({ ...prev, [libraryName]: !prev[libraryName] }));
+  };
 
    return (
     <div className="min-h-screen bg-[#e6e9ef] dark:bg-[#1e1e2e] flex items-center justify-center">
@@ -51,14 +57,35 @@ const ShareUI = ({ url, detectedLibraries }) => {
               const cleanedLine = lib.line ? lib.line.split('\n').map(l => l.trimStart()).join('\n') : '';
               return (
                 <Card key={index}>
-                  <CardContent className="flex justify-between items-center p-4 text-[#4c4f69] dark:text-[#cdd6f4] font-bold">
-                    <div className="flex items-center">
-                      {lib.detected ?  <em-emoji shortcodes=":white_check_mark:" set="apple"></em-emoji> : <em-emoji shortcodes=":x:" set="apple" size="1em"></em-emoji>}
-                      <span className="ml-2 mt-1 capitalize">{lib.name}</span>
-                    </div>
-                    {lib.detected}
-                  </CardContent>
                   {lib.detected && (
+                    <button
+                      onClick={() => toggleExpand(lib.name)}
+                      className="w-full text-left"
+                    >
+                      <CardContent className="flex justify-between items-center p-4 text-[#4c4f69] dark:text-[#cdd6f4] font-bold hover:bg-[#e6e9ef] dark:hover:bg-[#313244] cursor-pointer">
+                        <div className="flex items-center">
+                          {lib.detected ?
+                            <em-emoji shortcodes=":white_check_mark:" set="apple"></em-emoji> :
+                            <em-emoji shortcodes=":x:" set="apple" size="1em"></em-emoji>
+                          }
+                          <span className="ml-2 mt-1 capitalize">{lib.name}</span>
+                        </div>
+                        <span className="transition-transform duration-300"
+                              style={{ transform: expanded[lib.name] ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                          ▼
+                        </span>
+                      </CardContent>
+                    </button>
+                  )}
+                  {!lib.detected && (
+                    <CardContent className="flex items-center p-4 text-[#4c4f69] dark:text-[#cdd6f4] font-bold">
+                      <div className="flex items-center">
+                        <em-emoji shortcodes=":x:" set="apple" size="1em"></em-emoji>
+                        <span className="ml-2 mt-1 capitalize">{lib.name}</span>
+                      </div>
+                    </CardContent>
+                  )}
+                  <div className={`transition-all duration-300 ease-in-out ${lib.detected && expanded[lib.name] ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
                     <div className="bg-[#313244] dark:bg-[#11111b] p-2 rounded-b-lg">
                       <SyntaxHighlighter
                         language={getLanguage(lib.name)}
@@ -73,7 +100,7 @@ const ShareUI = ({ url, detectedLibraries }) => {
                         {cleanedLine}
                       </SyntaxHighlighter>
                     </div>
-                  )}
+                  </div>
                 </Card>
               );
             })}
