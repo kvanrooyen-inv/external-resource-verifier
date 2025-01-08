@@ -2,6 +2,8 @@ import React, { useState} from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import Footer from '../components/ui/footer';
+
 
 const friendlyOSName = () => {
   const platform = navigator.platform.toLowerCase();
@@ -107,6 +109,7 @@ const ShareUI = ({ url, detectedLibraries }) => {
           </div>
         </CardContent>
       </Card>
+      <Footer />
     </div>
   );
 };
