@@ -9,6 +9,7 @@ import { compressToEncodedURIComponent } from 'lz-string';
 import { FaShareAlt } from 'react-icons/fa'; // Using react-icons for Font Awesome
 import data from '@emoji-mart/data'
 import { init } from 'emoji-mart'
+import Footer from '../components/ui/footer';
 
 init({ data })
 
@@ -263,6 +264,7 @@ const StandardUI = () => {
           </div>
         </CardContent>
       </Card>
+      <Footer />
     </div>
   );
 };
