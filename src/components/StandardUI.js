@@ -85,9 +85,10 @@ const LIBRARY_DETECTION_METHODS = {
       .split("\n")
       .filter(
         (line) =>
-          line.toLowerCase().includes("") ||
-          line.toLowerCase().includes("fontawesome") ||
-          line.toLowerCase().includes("fa-"),
+          line.toLowerCase().includes("calcite.css") ||
+          line.toLowerCase().includes("calcite.js") ||
+          line.toLowerCase().includes("calcite.esm.js") ||
+          line.toLowerCase().includes("calcite.min.js"),
     ),
   webgl: (htmlStr) =>
     htmlStr
