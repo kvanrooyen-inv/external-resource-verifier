@@ -1,6 +1,6 @@
-const fetch = require('node-fetch');
-
 exports.handler = async (event) => {
+  // Dynamically import node-fetch
+  const {default: fetcg} = await import(`node-fetch`);
   const { url } = event.queryStringParameters;
 
   if (!url) {
@@ -11,7 +11,11 @@ exports.handler = async (event) => {
   }
 
   try {
-    const response = await fetch(url);
+    const response = await fetch(url,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatabile; MyApp/1.0; ~https://external-resource-checker.netlify.app)'
+      }
+    );
 
     // Get the response text
     const data = await response.text();
