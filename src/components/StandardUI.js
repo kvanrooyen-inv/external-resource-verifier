@@ -134,20 +134,12 @@ const StandardUI = () => {
 
     setLoading(true);
     try {
-      const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
-      const data = await res.json();
+      const res = await fetch(`/.netlify/functions/fetch-url?url=${encodeURIComponent(url)}`);
+        if (!res.ok) {
+          throw new Error('ERROR_FETCHING_URL');
+        }
+      const html = await res.text();
 
-      // Check for CORS proxy errors
-      if (!res.ok || (data.status && data.status.http_code >= 400)) {
-        throw new Error('CORS_ERROR');
-      }
-
-      // Check if we actually got HTML content
-      if (!data.contents || typeof data.contents !== 'string' || data.contents.includes('<?xml')) {
-        throw new Error('INVALID_RESPONSE');
-      }
-
-      const html = data.contents;
       const detected = Object.entries(LIBRARY_DETECTION_METHODS).reduce((acc, [libName, detector]) => {
         const lines = detector(html);
         if (lines.length > 0) {
