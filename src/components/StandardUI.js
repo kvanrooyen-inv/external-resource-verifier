@@ -85,7 +85,7 @@ const LIBRARY_DETECTION_METHODS = {
           line.toLowerCase().includes("fontawesome") ||
           line.toLowerCase().includes("fa-"),
       ),
-   fontAwesome: (htmlStr) =>
+   calcite: (htmlStr) =>
     htmlStr
       .split("\n")
       .filter(
