@@ -14,8 +14,7 @@ import { FaShareAlt } from "react-icons/fa"; // Using react-icons for Font Aweso
 import data from "@emoji-mart/data";
 import { init } from "emoji-mart";
 import Footer from "../components/ui/footer";
-import NewFeaturesDialog from "./NewFeaturesDialog";
-import { checkVersion } from "../utils/versionManager";
+
 
 init({ data });
 
@@ -107,16 +106,6 @@ const StandardUI = () => {
   const [expanded, setExpanded] = useState({});
   const [searched, setSearched] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [showNewFeatures, setShowNewFeatures] = useState(false);
-  const [currentVersion, setCurrentVersion] = useState(null);
-
-  useEffect(() => {
-    const { isNewVersion, currentVersion } = checkVersion();
-    if (isNewVersion) {
-      setShowNewFeatures(true);
-      setCurrentVersion(currentVersion);
-    }
-  }, []);
 
   const isValidURL = (input) => {
     try {
@@ -340,11 +329,6 @@ const StandardUI = () => {
           </div>
         </CardContent>
       </Card>
-      <NewFeaturesDialog
-        isOpen={showNewFeatures}
-        onClose={() => setShowNewFeatures(false)}
-        version={currentVersion}
-      />
       <Footer />
     </div>
   );
