@@ -10,6 +10,7 @@ import { FaShareAlt } from 'react-icons/fa'; // Using react-icons for Font Aweso
 import data from '@emoji-mart/data'
 import { init } from 'emoji-mart'
 import Footer from '../components/ui/footer';
+import HelpModal from '../components/HelpModal.js'
 
 init({ data })
 
@@ -294,11 +295,12 @@ const StandardUI = () => {
                   </div>
                 </Card>
               );
-            })}
+            })} 
           </div>
         </CardContent>
-      </Card>
+      </Card> 
       <Footer />
+      <HelpModal />
     </div>
   );
 };
