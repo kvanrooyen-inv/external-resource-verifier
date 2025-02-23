@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { CircleHelp } from 'lucide-react';
 
 const Dialog = ({ children, open, onOpenChange }) => (
@@ -33,12 +33,48 @@ const DialogTitle = ({ children, className = "" }) => (
   </h2>
 );
 
-const HelpModal = () => {
+const HelpModal = ({ onSubmitUrl }) => {
   const [isOpen, setIsOpen] = React.useState(false);
 
   const shortcuts = [
-    { key: 'Enter', description: 'Verify URL' }
+    { key: 'Enter', description: 'Verify the URL.' },
+    { key: '?', description: 'Open the help/about dialog window.'},
+    { key: 'Esc', description: 'Close the help/about dialog window.'}
   ];
+
+  useEffect(() => {
+    const handleKeyPress = (event) => {
+      // Check if we're in an input field
+      const isInputActive = document.activeElement.tagName === 'INPUT' ||
+                          document.activeElement.tagName === 'TEXTAREA';
+
+      // Handle '?' key
+      if (event.key === '?' && !isInputActive) {
+        event.preventDefault();
+        setIsOpen(true);
+      }
+
+      // Handle 'Enter' for URL verification
+      if (event.key === 'Enter' && !isOpen && isInputActive) {
+        event.preventDefault();
+        onSubmitUrl?.();
+      }
+
+      // Handle 'Escape' key
+      if (event.key === 'Escape' && isOpen) {
+        event.preventDefault();
+        setIsOpen(false);
+      }
+    };
+
+    // Add the event listener
+    window.addEventListener('keydown', handleKeyPress);
+
+    // Cleanup function
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [isOpen, onSubmitUrl]);
 
   return (
     <>

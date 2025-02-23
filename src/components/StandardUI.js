@@ -300,7 +300,7 @@ const StandardUI = () => {
         </CardContent>
       </Card> 
       <Footer />
-      <HelpModal />
+      <HelpModal onSubmitUrl={handleVerify}/>
     </div>
   );
 };
