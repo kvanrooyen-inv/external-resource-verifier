@@ -1,5 +1,4 @@
 import React from 'react';
-import { Button } from '../components/ui/button';
 import { CircleHelp } from 'lucide-react';
 
 const Dialog = ({ children, open, onOpenChange }) => (
@@ -38,20 +37,17 @@ const HelpModal = () => {
   const [isOpen, setIsOpen] = React.useState(false);
 
   const shortcuts = [
-    { key: 'Enter', description: 'Verify URL' },
-    { key: 'Esc', description: 'Close expanded library details' },
+    { key: 'Enter', description: 'Verify URL' }
   ];
 
   return (
     <>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="fixed bottom-4 right-4 z-40 w-10 h-10 text-[#4c4f69] dark:text-[#cdd6f4] hover:bg-transparent hover:text-[#1e66f5] dark:hover:text-[#89b4fa]"
+      <button
+        className="fixed bottom-4 right-4 z-40 p-0 bg-transparent border-none cursor-pointer"
         onClick={() => setIsOpen(true)}
       >
-        <CircleHelp className="w-6 h-6" />
-      </Button>
+        <CircleHelp className="w-6 h-6 text-black dark:text-white" />
+      </button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="sm:max-w-[425px]">
