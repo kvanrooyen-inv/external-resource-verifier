@@ -11,98 +11,9 @@ import data from '@emoji-mart/data'
 import { init } from 'emoji-mart'
 import Footer from '../components/ui/footer';
 import HelpModal from '../components/HelpModal.js'
+import { client } from '../lib/sanity.js'
 
 init({ data })
-
-const LIBRARY_DETECTION_METHODS = {
-  bootstrap: (htmlStr) =>
-    htmlStr
-      .split("\n")
-      .filter(
-        (line) =>
-          line.toLowerCase().includes("bootstrap.css") ||
-          line.toLowerCase().includes("bootstrap.min.css") ||
-          line.toLowerCase().includes("cdn.jsdelivr.net/npm/bootstrap"),
-      ),
-  vue: (htmlStr) =>
-    htmlStr
-      .split("\n")
-      .filter(
-        (line) =>
-          line.toLowerCase().includes("vue.js") ||
-          line.toLowerCase().includes("vue.min.js") ||
-          line.toLowerCase().includes("vue-router") ||
-          line.toLowerCase().includes("vuex") ||
-          line.toLowerCase().includes("vue.global.js"),
-      ),
-  react: (htmlStr) =>
-    htmlStr
-      .split("\n")
-      .filter(
-        (line) =>
-          line.toLowerCase().includes("react.js") ||
-          line.toLowerCase().includes("react.production.min.js") ||
-          line.toLowerCase().includes("react.development.js") ||
-          line.toLowerCase().includes("react-dom.development.js") ||
-          line.toLowerCase().includes("react-dom.js"),
-      ),
-  tailwind: (htmlStr) =>
-    htmlStr
-      .split("\n")
-      .filter(
-        (line) =>
-          line.toLowerCase().includes("tailwind.css") ||
-          line.toLowerCase().includes("tailwindcss") ||
-          line.toLowerCase().includes("cdn.tailwindcss.com"),
-      ),
-  jquery: (htmlStr) =>
-    htmlStr
-      .split("\n")
-      .filter(
-        (line) =>
-          line.toLowerCase().includes("jquery.js") ||
-          line.toLowerCase().includes("jquery.min.js"),
-      ),
-  angular: (htmlStr) =>
-    htmlStr
-      .split("\n")
-      .filter(
-        (line) =>
-          line.toLowerCase().includes("angular.js") ||
-          line.toLowerCase().includes("angular.min.js") ||
-          line.toLowerCase().includes("@angular/core"),
-      ),
-  fontAwesome: (htmlStr) =>
-    htmlStr
-      .split("\n")
-      .filter(
-        (line) =>
-          line.toLowerCase().includes("font-awesome") ||
-          line.toLowerCase().includes("fontawesome") ||
-          line.toLowerCase().includes("fa-"),
-      ),
-   calcite: (htmlStr) =>
-    htmlStr
-      .split("\n")
-      .filter(
-        (line) =>
-          line.toLowerCase().includes("calcite.css") ||
-          line.toLowerCase().includes("calcite.js") ||
-          line.toLowerCase().includes("calcite.esm.js") ||
-          line.toLowerCase().includes("calcite.min.js"),
-    ),
-  webgl: (htmlStr) =>
-    htmlStr
-      .split("\n")
-      .filter(
-        (line) =>
-          line.toLowerCase().includes("webgl") ||
-          line.toLowerCase().includes("three.js") ||
-          line.toLowerCase().includes("babylon.js") ||
-          line.toLowerCase().includes("gl-matrix.js") ||
-          line.toLowerCase().includes('canvas.getcontext("webgl")'),
-      ),
-};
 
 const StandardUI = () => {
   const [url, setUrl] = useState('');
@@ -112,6 +23,26 @@ const StandardUI = () => {
   const [expanded, setExpanded] = useState({});
   const [searched, setSearched] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [libraryRules, setLibraryRules] = useState([]);
+
+  useEffect(() => {
+  const fetchLibraryRules = async () => {
+    try {
+      const query = `*[_type == "library"] {
+        displayName,
+        keywords,
+        syntaxHighlightType
+      }`
+      const rules = await client.fetch(query)
+      setLibraryRules(rules)
+    } catch (err) {
+      console.error('Error fetch library rules: ', err)
+      setError('Error loading library detection rules.')
+    }
+  }
+
+  fetchLibraryRules()
+}, [])
 
   const isValidURL = (input) => {
     try {
@@ -142,14 +73,22 @@ const StandardUI = () => {
         }
       const html = await res.text();
 
-      const detected = Object.entries(LIBRARY_DETECTION_METHODS).reduce((acc, [libName, detector]) => {
-        const lines = detector(html);
+      const detected = libraryRules.reduce((acc, rule) => {
+        const { displayName, keywords, syntaxHighlightType } = rule;
+        // Split the HTML into lines and check if any keyword appears in a line
+        const lines = html.split("\n").filter(line =>
+          keywords.some(keyword => line.toLowerCase().includes(keyword.toLowerCase()))
+        );
         if (lines.length > 0) {
-          acc.push({ name: libName, lines });
+          acc.push({
+            name: displayName,
+            lines,
+            syntaxHighlightType,
+         });
         }
         return acc;
       }, []);
-
+      
       setLibraries(detected);
       setSearched(true);
     } catch (e) {
@@ -167,11 +106,6 @@ const StandardUI = () => {
 
   const toggleExpand = (libraryName) => {
     setExpanded((prev) => ({ ...prev, [libraryName]: !prev[libraryName] }));
-  };
-
-  const getLanguage = (libName) => {
-    // Only webgl uses JS syntax highlighting; all others use HTML
-    return libName === 'webgl' ? 'javascript' : 'html';
   };
 
   const handleShare = async () => {
@@ -280,7 +214,7 @@ const StandardUI = () => {
                   <div className={`transition-all duration-300 ease-in-out ${expanded[lib.name] ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
                     <div className="bg-[#313244] p-2 rounded-b-lg">
                       <SyntaxHighlighter
-                        language={getLanguage(lib.name)}
+                        language={lib.syntaxHighlightType}
                         style={dracula}
                         customStyle={{
                           backgroundColor: 'transparent',
