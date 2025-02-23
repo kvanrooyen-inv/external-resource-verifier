@@ -86,7 +86,7 @@ const HelpModal = () => {
             <div>
               <h3 className="text-lg font-semibold mb-2 text-[#4c4f69] dark:text-[#cdd6f4]">Version</h3>
               <p className="text-sm text-[#4c4f69] dark:text-[#bac2de]">
-                v1.0.0
+                v1.0.1
               </p>
             </div>
           </div>
