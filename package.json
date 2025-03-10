@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@emoji-mart/data": "^1.2.1",
+    "@sanity/block-content-to-react": "^3.0.0",
     "@shadcn/ui": "^0.0.4",
     "autoprefixer": "^10.4.20",
     "cra-template": "1.2.0",

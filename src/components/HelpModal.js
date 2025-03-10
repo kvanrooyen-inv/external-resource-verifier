@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import { CircleHelp } from 'lucide-react';
+import { client } from '../lib/sanity.js';
+import BlockContent from "@sanity/block-content-to-react";
 
 const Dialog = ({ children, open, onOpenChange }) => (
   <div 
@@ -35,6 +37,37 @@ const DialogTitle = ({ children, className = "" }) => (
 
 const HelpModal = ({ onSubmitUrl }) => {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [aboutData, setAboutData] = React.useState({
+    title: 'About',
+    aboutDesc: []
+  });
+
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  // Fetch about data from Sanity
+  useEffect(() => {
+    const fetchAboutData = async () => {
+      try {
+        setIsLoading(true);
+        // GROQ query to fetch the about document
+        const query = `*[_type == "about"][0]{
+          title,
+          aboutDesc
+        }`;
+        
+        const data = await client.fetch(query);
+        if (data) {
+          setAboutData(data);
+        }
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error fetching about data:', error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchAboutData();
+  }, []);
 
   const shortcuts = [
     { key: 'Enter', description: 'Verify the URL.' },
@@ -67,14 +100,43 @@ const HelpModal = ({ onSubmitUrl }) => {
       }
     };
 
-    // Add the event listener
     window.addEventListener('keydown', handleKeyPress);
 
-    // Cleanup function
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
     };
   }, [isOpen, onSubmitUrl]);
+
+  const serializers = {
+    types: {
+      block: props => {
+        const {style = 'normal'} = props.node;
+        
+        if (style === 'normal') {
+          return <p className="text-sm text-[#4c4f69] dark:text-[#bac2de] mb-2">{props.children}</p>;
+        }
+        
+        // Add other styles if needed
+        return BlockContent.defaultSerializers.types.block(props);
+      }
+    },
+    marks: {
+      link: ({mark, children}) => {
+        const {href} = mark;
+        const target = href.startsWith('http') ? '_blank' : undefined;
+        return (
+          <a 
+            href={href}
+            target={target} 
+            rel={target === '_blank' ? 'noopener noreferrer' : undefined}
+            className="text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            {children}
+          </a>
+        );
+      }
+    }
+  };
 
   return (
     <>
@@ -92,14 +154,22 @@ const HelpModal = ({ onSubmitUrl }) => {
           </DialogHeader>
           
           <div className="space-y-6">
-            <div>
-              <h3 className="text-lg font-semibold mb-2 text-[#4c4f69] dark:text-[#cdd6f4]">About</h3>
-              <p className="text-sm text-[#4c4f69] dark:text-[#bac2de]">
-                External Resource Checker helps you identify external libraries and resources used on any website. 
-                Simply enter a URL, and the tool will scan the page for common frameworks, libraries, and resources.
-              </p>
+           <div>
+              <h3 className="text-lg font-semibold mb-2 text-[#4c4f69] dark:text-[#cdd6f4]">{aboutData.title}</h3>
+              
+              {!isLoading && aboutData.aboutDesc && aboutData.aboutDesc.length > 0 ? (
+                <BlockContent 
+                  blocks={aboutData.aboutDesc}
+                  serializers={serializers}
+                  projectId={client.config().projectId}
+                  dataset={client.config().dataset}
+                />
+              ) : (
+                <p className="text-sm text-[#4c4f69] dark:text-[#bac2de] mb-2">
+                  {isLoading ? 'Loading...' : 'No content available.'}
+                </p>
+              )}
             </div>
-
             <div>
               <h3 className="text-lg font-semibold mb-2 text-[#4c4f69] dark:text-[#cdd6f4]">Keyboard Shortcuts</h3>
               <div className="space-y-2">
