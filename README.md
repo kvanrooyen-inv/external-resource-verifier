@@ -18,14 +18,17 @@ The External Resource Verifier simplifies the review process by allowing non-tec
 
 ### Supported Libraries
 The tool checks for the following external resources:
-- Bootstrap
-- Vue.js
-- React
-- Tailwind CSS
-- jQuery
-- Angular
-- Font Awesome
-- WebGL
+- [Angular](https://angular.dev/)
+- [Bootstrap](https://getbootstrap.com/)
+- [Calcite](https://developers.arcgis.com/calcite-design-system/)
+- [Font Awesome](https://fontawesome.com/)
+- [Ionic](https://ionicframework.com/)
+- [jQuery](https://jquery.com/)
+- [React](https://react.dev)
+- [Tailwind CSS](https://https://tailwindcss.com/)
+- [Three.js](https://threejs.org/)
+- [Vue](https://vuejs.org/)
+- [WebGL](https://www.khronos.org/webgl/)
 
 ## How to Use
 
