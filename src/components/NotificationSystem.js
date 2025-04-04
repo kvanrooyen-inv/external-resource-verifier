@@ -18,7 +18,6 @@ const NotificationSystem = () => {
   
   useEffect(() => {
     const lastViewed = getLastViewedTimestamp();
-    const now = new Date().toISOString();
     
     // Query for updates since last viewed timestamp
     const query = `*[_type == "update" && _updatedAt > $lastViewed] | order(releaseDate desc)`;
