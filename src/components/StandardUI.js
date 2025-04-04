@@ -12,12 +12,14 @@ import { init } from 'emoji-mart'
 import Footer from '../components/ui/footer';
 import HelpModal from '../components/HelpModal.js'
 import { client } from '../lib/sanity.js'
+import TabUI from '../components/TabUI.js';
 
 init({ data })
 
 const StandardUI = () => {
   const [url, setUrl] = useState('');
   const [libraries, setLibraries] = useState([]);
+  const [alerts, setAlerts] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState({});
@@ -50,6 +52,21 @@ const StandardUI = () => {
       return true;
     } catch (_) {
       return false;
+    }
+  };
+    // Function to detect JavaScript alerts in the HTML
+  const detectJavaScriptAlerts = (html) => {
+    // Simple regex to detect alert() patterns in scripts
+    const alertPattern = /alert\s*\([^)]*\)/g;
+    const matches = html.match(alertPattern);
+    
+    if (matches && matches.length > 0) {
+      // Create alert objects similar to library objects
+      return [{
+        id: 1,
+        name: 'JavaScript Alert',
+        code: matches.join('\n'),
+      }];
     }
   };
 
@@ -90,6 +107,11 @@ const StandardUI = () => {
       }, []);
       
       setLibraries(detected);
+
+      // Detect JavaScript alerts
+      const detectedAlerts = detectJavaScriptAlerts(html);
+      setAlerts(detectedAlerts);
+
       setSearched(true);
     } catch (e) {
       console.error(e);
