@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
@@ -25,7 +26,6 @@ const StandardUI = () => {
   const [searched, setSearched] = useState(false);
   const [copied, setCopied] = useState(false);
   const [libraryRules, setLibraryRules] = useState([]);
-  const [showTabUI, setShowTabUI] = useState(false); // State to control TabUI display
 
   useEffect(() => {
     const fetchLibraryRules = async () => {
@@ -77,7 +77,6 @@ const StandardUI = () => {
     setExpanded({});
     setSearched(false);
     setCopied(false);
-    setShowTabUI(false);
 
     if (!isValidURL(url)) {
       setError('Please enter a valid URL.');
@@ -115,11 +114,6 @@ const StandardUI = () => {
       setLibraries(detected);
       setAlerts(detectedAlerts);
       setSearched(true);
-      
-      // Show TabUI if we found alerts or libraries
-      if (detected.length > 0 || detectedAlerts.length > 0) {
-        setShowTabUI(true);
-      }
       
     } catch (e) {
       console.error(e);
@@ -168,6 +162,9 @@ const StandardUI = () => {
     }
   }, [copied]);
 
+  // Determine if we should show TabUI (only when alerts are present)
+  const shouldShowTabUI = alerts.length > 0;
+
   return (
     <div className="min-h-screen bg-[#e6e9ef] dark:bg-[#1e1e2e] flex flex-col items-center justify-center">
       {copied && (
@@ -212,8 +209,8 @@ const StandardUI = () => {
               {loading ? 'Verifying...' : 'Verify'}
             </Button>
 
-            {/* Show TabUI when we have results to display */}
-            {showTabUI ? (
+            {/* Show TabUI only when we have alerts */}
+            {shouldShowTabUI ? (
               <TabUI 
                 libraries={libraries}
                 alerts={alerts}
@@ -231,7 +228,7 @@ const StandardUI = () => {
                   </div>
                 )}
 
-                {/* Display libraries (only if TabUI is not shown) */}
+                {/* Display libraries in StandardUI */}
                 {libraries.map((lib, index) => {
                   const cleanedLines = lib.lines.map(line => line.trimStart()).join('\n');
 
@@ -287,3 +284,4 @@ const StandardUI = () => {
 };
 
 export default StandardUI;
+
