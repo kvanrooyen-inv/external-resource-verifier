@@ -85,7 +85,7 @@ const TabUI = ({
                       <CardContent className="flex justify-between items-center p-4 hover:bg-[#e6e9ef] dark:hover:bg-[#313244] cursor-pointer">
                         <div className="flex items-center font-bold">
                           <span className="text-[#40a02b] dark:text-[#a6e3a1]">
-                            <em-emoji shortcodes=":warning:" set="apple"></em-emoji>
+                            <em-emoji shortcodes=":white_check_mark:" set="apple"></em-emoji>
                           </span>
                           <span className="mt-1 ml-2 capitalize text-[#1e1e2e] dark:text-[#cdd6f4] opacity-100">{lib.name}</span>
                         </div>
