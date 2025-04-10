@@ -5,7 +5,6 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { compressToEncodedURIComponent } from 'lz-string';
 import { FaShareAlt } from 'react-icons/fa'; // Using react-icons for Font Awesome
 import data from '@emoji-mart/data';
 import { init } from 'emoji-mart';
@@ -132,28 +131,43 @@ const StandardUI = () => {
     setExpanded((prev) => ({ ...prev, [itemName]: !prev[itemName] }));
   };
 
-  const handleShare = async () => {
-    const payload = {
-      url,
-      detectedLibraries: libraries.map((lib) => ({
-        name: lib.name,
+const handleShare = async () => {
+  const payload = {
+    url,
+    detectedLibraries: libraries.map((lib) => ({
+      name: lib.name,
+      detected: true,
+      line: lib.lines.join('\n')
+    })),
+    detectedAlerts: alerts.map((alert) => ({
+        name: alert.name,
         detected: true,
-        line: lib.lines.join('\n')
-      })),
-      detectedAlerts: alerts
+        line: alert.code
+    })),
+    osName: navigator.platform,
     };
 
-    const compressed = compressToEncodedURIComponent(JSON.stringify(payload));
-    const shareURL = `${window.location.origin}?share=${compressed}`;
-
-    try {
-      await navigator.clipboard.writeText(shareURL);
-      setCopied(true); 
-    } catch (err) {
-      console.error('Failed to copy: ', err);
+  try {
+    setLoading(true); // Show loading state while saving
+    const response = await fetch('/.netlify/functions/save-report', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to save report');
     }
-  };
-
+    
+    const data = await response.json();
+    await navigator.clipboard.writeText(data.shareUrl);
+    setCopied(true);
+  } catch (err) {
+    console.error('Failed to save or copy: ', err);
+    setError('Failed to create share link. Please try again.');
+  } finally {
+    setLoading(false);
+  }
+};
   // Hide the copied message after 2 seconds
   useEffect(() => {
     if (copied) {
