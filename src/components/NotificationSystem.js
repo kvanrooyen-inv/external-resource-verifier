@@ -17,74 +17,86 @@ const NotificationSystem = () => {
   const [notifications, setNotifications] = useState([]);
   const [currentUpdateIndex, setCurrentUpdateIndex] = useState(null);
   const [needsRefresh, setNeedsRefresh] = useState(false);
-  // Removed lastCheckTime since it's not being used
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
   // Function to check for updates - wrapped in useCallback to prevent infinite loops
   const checkForUpdate = useCallback(() => {
     const lastViewed = getLastViewedTimestamp();
 
-    // Query for updates since last viewed timestamp
-    const query = `*[_type == "update" && _updatedAt > $lastViewed] | order(releaseDate desc)`;
+    // Query for the most recent update, including _updatedAt
+    const query = `*[_type == "update"] | order(releaseDate desc)[0] {
+      _id,
+      _updatedAt,
+      title,
+      updateDescription,
+      releaseDate,
+      importance
+    }`;
 
-    client.fetch(query, {lastViewed})
-      .then(updates => {
-        // Removed the now and setLastCheckTime calls
-
-        // If we have updates and the app is already showing content
-        if (updates.length > 0) {
+    client.fetch(query)
+      .then(latestUpdate => {
+        if (!latestUpdate) return; // No updates available
+        
+        if (!initialLoadComplete) {
+          // Compare full timestamps for more granular detection
+          const lastViewedTimestamp = new Date(lastViewed).getTime();
+          const updateTimestamp = new Date(latestUpdate._updatedAt).getTime();
+          
+          if (updateTimestamp > lastViewedTimestamp) {
+            setNotifications([latestUpdate]);
+            setCurrentUpdateIndex(0); // Show the update
+          }
+          setInitialLoadComplete(true);
+        } else {
+          // After initial load, check if there's a new update since last viewed
           if (notifications.length > 0) {
-            // Compare with existing notifications to see if there are new ones
-            const newUpdateIds = updates.map(update => update._id);
-            const existingUpdateIds = notifications.map(notification => notification._id);
-
-            // Check if there are any new updates
-            const hasNewUpdates = newUpdateIds.some(id => !existingUpdateIds.includes(id));
-
-            if (hasNewUpdates) {
-              // New updates available, prompt for refresh
+            const currentUpdateTimestamp = new Date(notifications[0]._updatedAt).getTime();
+            const newUpdateTimestamp = new Date(latestUpdate._updatedAt).getTime();
+            
+            // Show refresh prompt if update is newer than what we're currently showing
+            if (newUpdateTimestamp > currentUpdateTimestamp) {
               setNeedsRefresh(true);
             }
-          } else {
-            // First load, just show updates.
-            setNotifications(updates);
-            setCurrentUpdateIndex(0); // Show the first update
+          } else if (latestUpdate) {
+            // If we somehow don't have notifications yet but there is an update
+            const lastViewedTimestamp = new Date(lastViewed).getTime();
+            const updateTimestamp = new Date(latestUpdate._updatedAt).getTime();
+            
+            if (updateTimestamp > lastViewedTimestamp) {
+              setNeedsRefresh(true);
+            }
           }
         }
       })
       .catch(err => {
         console.error('Error fetching updates: ', err);
       });
-  }, [notifications]); // Added notifications as a dependency
+  }, [notifications, initialLoadComplete]);
 
-  // Initial check on component mount.
+  // Initial check on component mount
   useEffect(() => {
     checkForUpdate();
 
-    // Set up periodic checking for new updates.
+    // Set up periodic checking for new updates
     const intervalId = setInterval(() => {
       checkForUpdate();
     }, 5 * 60 * 1000); // Check every 5 minutes
 
     return () => clearInterval(intervalId);
-  }, [checkForUpdate]); // Added checkForUpdate as a dependency
+  }, [checkForUpdate]);
 
   const handleCloseModal = () => {
-    if (currentUpdateIndex < notifications.length - 1) {
-      // Show next update
-      setCurrentUpdateIndex(currentUpdateIndex + 1);
-    } else {
-      // All updates have been viewed
-      setCurrentUpdateIndex(null);
-      
-      // Update the timestamp after viewing all updates
-      const now = new Date().toISOString();
-      setLastViewedTimestamp(now);
-    }
+    // All updates have been viewed
+    setCurrentUpdateIndex(null);
+    
+    // Update the timestamp after viewing
+    const now = new Date().toISOString();
+    setLastViewedTimestamp(now);
   };
 
   const handleRefresh = () => {
     window.location.reload();
-  }
+  };
   
   return (
     <>
@@ -99,7 +111,7 @@ const NotificationSystem = () => {
         <RefreshPrompt
           onRefresh={handleRefresh}
           onDismiss={() => setNeedsRefresh(false)}
-      />
+        />
       )}
     </>
   );
