@@ -6,10 +6,7 @@ import { Card, CardContent } from "./card.js";
 const ExpandableCard = ({
   itemName,
   displayName,
-  icon = {
-    className: "text-[#40a02b] dark:text-[#a6e3a1]",
-    emoji: ":white_check_mark:",
-  },
+  icon,
   content,
   expanded,
   toggleExpand,

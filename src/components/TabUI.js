@@ -3,6 +3,7 @@ import EmptyState from "./ui/EmptyState.js";
 import ExpandableCard from "./ui/ExpandableCard";
 import TabButton from "./ui/TabButton";
 import AlertBadge from "./ui/AlertBadge";
+import TabSelector from "./ui/TabSelector.js";
 
 const TabUI = ({
   libraries = [],
@@ -31,25 +32,12 @@ const TabUI = ({
       </div>
 
       {/* Tab selector */}
-      <div className="flex rounded-lg overflow-hidden">
-        <TabButton
-          active={activeTab === "resources"}
-          onClick={() => switchTab("resources")}
-        >
-          External Resources ({libraries.length})
-        </TabButton>
-
-        <TabButton
-          active={activeTab === "alerts"}
-          onClick={() => switchTab("alerts")}
-        >
-          <div className="flex items-center justify-center">
-            JavaScript Alerts
-            {alerts.length > 0 && <AlertBadge count={alerts.length} />}
-          </div>
-        </TabButton>
-      </div>
-
+      <TabSelector
+        activeTab={activeTab}
+        onTabChange={switchTab}
+        librariesCount={libraries.length}
+        alertsCount={alerts.length}
+      />
       {/* Tab content */}
       <div className="mt-4">
         {/* Libraries content */}
@@ -69,10 +57,6 @@ const TabUI = ({
                     key={index}
                     itemName={lib.name}
                     displayName={lib.name}
-                    icon={{
-                      className: "text-[#40a02b] dark:text-[#a6e3a1]",
-                      emoji: ":white_check_mark:",
-                    }}
                     content={cleanedLines}
                     expanded={expanded}
                     toggleExpand={toggleExpand}
@@ -95,14 +79,11 @@ const TabUI = ({
                   key={index}
                   itemName={`alert-${alert.id}`}
                   displayName={alert.name}
-                  icon={{
-                    className: "text-[#f38ba8]",
-                    emoji: ":warning:",
-                  }}
                   content={alert.code}
                   expanded={expanded}
                   toggleExpand={toggleExpand}
                   language="javascript"
+                  type="alert"
                 />
               ))
             )}
