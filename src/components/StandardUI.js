@@ -18,6 +18,7 @@ import HelpModal from "../components/HelpModal.js";
 import EmptyState from "../components/ui/EmptyState.js";
 import { client } from "../lib/sanity.js";
 import TabUI from "../components/TabUI"; // Import TabUI component
+import CopyNotification from "../components/ui/CopyNotification.js";
 
 init({ data });
 
@@ -192,11 +193,7 @@ const StandardUI = () => {
 
   return (
     <div className="min-h-screen bg-[#e6e9ef] dark:bg-[#1e1e2e] flex flex-col items-center justify-center">
-      {copied && (
-        <div className="absolute top-4 bg-[#313244] text-[#cdd6f4] px-4 py-2 rounded-md shadow-md text-sm">
-          Share link copied!
-        </div>
-      )}
+      <CopyNotification visible={copied} />
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-center mb-5 text-2xl">
