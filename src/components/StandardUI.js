@@ -194,11 +194,9 @@ const StandardUI = () => {
   return (
     <div className="min-h-screen bg-[#e6e9ef] dark:bg-[#1e1e2e] flex flex-col items-center justify-center">
       <CopyNotification visible={copied} />
-      <Card className="w-full max-w-md">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-center mb-5 text-2xl">
-            External Resource Checker
-          </CardTitle>
+          <CardTitle>External Resource Checker</CardTitle>
           <p className="text-center text-sm mb-4 text-[#5c5f77] dark:text-[#bac2de]">
             Enter a URL to verify whether it uses certain external resources or
             contains JavaScript alerts.
@@ -214,11 +212,7 @@ const StandardUI = () => {
                 onChange={(e) => setUrl(e.target.value)}
               />
               {(libraries.length > 0 || alerts.length > 0) && (
-                <button
-                  onClick={handleShare}
-                  className="text-[#4c4f69] dark:text-[#cdd6f4] hover:text-[#1e66f5] dark:hover:text-[#89b4fa] text-sm"
-                  title="Share Results"
-                >
+                <button onClick={handleShare} title="Share Results">
                   <FaShareAlt />
                 </button>
               )}

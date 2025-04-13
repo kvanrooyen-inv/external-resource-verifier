@@ -167,15 +167,15 @@ const ReportPage = () => {
   const activeItems = activeTab === "resources" ? libraries : alerts;
 
   return (
+    //TODO: This needs to be made into a component so that the placement of items can be reused.
     <div className="min-h-screen bg-[#e6e9ef] dark:bg-[#1e1e2e] flex items-center justify-center">
       {report && (
-        <Card className="w-full max-w-md bg-[#eff1f5] dark:bg-[#181825] border-[#9ca0b0] dark:border-[#313244]">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-center text-2xl">
-              External Resource Report
-            </CardTitle>
+            <CardTitle>External Resource Report</CardTitle>
           </CardHeader>
           <CardContent>
+            {/* TODO: This needs to be made into a component as well. */}
             <div className="space-y-4">
               {/* Information Box */}
               <div className="bg-[#e6e9ef] dark:bg-[#313244] p-4 rounded-md text-[#4c4f69] dark:text-[#cdd6f4]">
