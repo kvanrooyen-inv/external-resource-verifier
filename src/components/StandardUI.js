@@ -1,25 +1,30 @@
-
-import React, { useState, useEffect } from 'react';
-import { Input } from '../components/ui/input';
-import { Button } from '../components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { FaShareAlt } from 'react-icons/fa'; // Using react-icons for Font Awesome
-import data from '@emoji-mart/data';
-import { init } from 'emoji-mart';
-import Footer from '../components/ui/footer';
-import HelpModal from '../components/HelpModal.js';
-import { client } from '../lib/sanity.js';
-import TabUI from '../components/TabUI'; // Import TabUI component
+import React, { useState, useEffect } from "react";
+import { Input } from "../components/ui/input";
+import { Button } from "../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import ExpandableCard from "../components/ui/ExpandableCard.js";
+import { FaShareAlt } from "react-icons/fa"; // Using react-icons for Font Awesome
+import data from "@emoji-mart/data";
+import { init } from "emoji-mart";
+import Footer from "../components/ui/footer";
+import HelpModal from "../components/HelpModal.js";
+import EmptyState from "../components/ui/EmptyState.js";
+import { client } from "../lib/sanity.js";
+import TabUI from "../components/TabUI"; // Import TabUI component
+import CopyNotification from "../components/ui/CopyNotification.js";
 
 init({ data });
 
 const StandardUI = () => {
-  const [url, setUrl] = useState('');
+  const [url, setUrl] = useState("");
   const [libraries, setLibraries] = useState([]);
   const [alerts, setAlerts] = useState([]); // Add state for JS alerts
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState({});
   const [searched, setSearched] = useState(false);
@@ -37,8 +42,8 @@ const StandardUI = () => {
         const rules = await client.fetch(query);
         setLibraryRules(rules);
       } catch (err) {
-        console.error('Error fetch library rules: ', err);
-        setError('Error loading library detection rules.');
+        console.error("Error fetch library rules: ", err);
+        setError("Error loading library detection rules.");
       }
     };
 
@@ -58,19 +63,19 @@ const StandardUI = () => {
   const detectJsAlerts = (html) => {
     const alertRegex = /alert\s*\([^)]*\)/g;
     const matches = html.match(alertRegex);
-    
+
     if (matches) {
       return matches.map((match, index) => ({
         id: index,
         name: `JavaScript Alert #${index + 1}`,
-        code: match
+        code: match,
       }));
     }
     return [];
   };
 
   const handleVerify = async () => {
-    setError('');
+    setError("");
     setLibraries([]);
     setAlerts([]);
     setExpanded({});
@@ -78,15 +83,17 @@ const StandardUI = () => {
     setCopied(false);
 
     if (!isValidURL(url)) {
-      setError('Please enter a valid URL.');
+      setError("Please enter a valid URL.");
       return;
     }
 
     setLoading(true);
     try {
-      const res = await fetch(`/.netlify/functions/fetch-url?url=${encodeURIComponent(url)}`);
+      const res = await fetch(
+        `/.netlify/functions/fetch-url?url=${encodeURIComponent(url)}`,
+      );
       if (!res.ok) {
-        throw new Error('ERROR_FETCHING_URL');
+        throw new Error("ERROR_FETCHING_URL");
       }
       const html = await res.text();
 
@@ -94,9 +101,13 @@ const StandardUI = () => {
       const detected = libraryRules.reduce((acc, rule) => {
         const { displayName, keywords, syntaxHighlightType } = rule;
         // Split the HTML into lines and check if any keyword appears in a line
-        const lines = html.split("\n").filter(line =>
-          keywords.some(keyword => line.toLowerCase().includes(keyword.toLowerCase()))
-        );
+        const lines = html
+          .split("\n")
+          .filter((line) =>
+            keywords.some((keyword) =>
+              line.toLowerCase().includes(keyword.toLowerCase()),
+            ),
+          );
         if (lines.length > 0) {
           acc.push({
             name: displayName,
@@ -106,20 +117,19 @@ const StandardUI = () => {
         }
         return acc;
       }, []);
-      
+
       // Detect JS alerts
       const detectedAlerts = detectJsAlerts(html);
-      
+
       setLibraries(detected);
       setAlerts(detectedAlerts);
       setSearched(true);
-      
     } catch (e) {
       console.error(e);
-      if (e.message === 'CORS_ERROR' || e.message === 'INVALID_RESPONSE') {
-        setError('Unable to scrape website data. Please try again later.');
+      if (e.message === "CORS_ERROR" || e.message === "INVALID_RESPONSE") {
+        setError("Unable to scrape website data. Please try again later.");
       } else {
-        setError('There was an error fetching or processing the provided URL.');
+        setError("There was an error fetching or processing the provided URL.");
       }
       setSearched(false);
     } finally {
@@ -131,43 +141,43 @@ const StandardUI = () => {
     setExpanded((prev) => ({ ...prev, [itemName]: !prev[itemName] }));
   };
 
-const handleShare = async () => {
-  const payload = {
-    url,
-    detectedLibraries: libraries.map((lib) => ({
-      name: lib.name,
-      detected: true,
-      line: lib.lines.join('\n')
-    })),
-    detectedAlerts: alerts.map((alert) => ({
+  const handleShare = async () => {
+    const payload = {
+      url,
+      detectedLibraries: libraries.map((lib) => ({
+        name: lib.name,
+        detected: true,
+        line: lib.lines.join("\n"),
+      })),
+      detectedAlerts: alerts.map((alert) => ({
         name: alert.name,
         detected: true,
-        line: alert.code
-    })),
-    osName: navigator.platform,
+        line: alert.code,
+      })),
+      osName: navigator.platform,
     };
 
-  try {
-    setLoading(true); // Show loading state while saving
-    const response = await fetch('/.netlify/functions/save-report', {
-      method: 'POST',
-      body: JSON.stringify(payload)
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to save report');
+    try {
+      setLoading(true); // Show loading state while saving
+      const response = await fetch("/.netlify/functions/save-report", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save report");
+      }
+
+      const data = await response.json();
+      await navigator.clipboard.writeText(data.shareUrl);
+      setCopied(true);
+    } catch (err) {
+      console.error("Failed to save or copy: ", err);
+      setError("Failed to create share link. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    
-    const data = await response.json();
-    await navigator.clipboard.writeText(data.shareUrl);
-    setCopied(true);
-  } catch (err) {
-    console.error('Failed to save or copy: ', err);
-    setError('Failed to create share link. Please try again.');
-  } finally {
-    setLoading(false);
-  }
-};
+  };
   // Hide the copied message after 2 seconds
   useEffect(() => {
     if (copied) {
@@ -181,18 +191,13 @@ const handleShare = async () => {
 
   return (
     <div className="min-h-screen bg-[#e6e9ef] dark:bg-[#1e1e2e] flex flex-col items-center justify-center">
-      {copied && (
-        <div className="absolute top-4 bg-[#313244] text-[#cdd6f4] px-4 py-2 rounded-md shadow-md text-sm">
-          Share link copied!
-        </div>
-      )}
-      <Card className="w-full max-w-md">
+      <CopyNotification visible={copied} />
+      <Card>
         <CardHeader>
-          <CardTitle className="text-center mb-5 text-2xl">
-            External Resource Checker
-          </CardTitle>
+          <CardTitle>External Resource Checker</CardTitle>
           <p className="text-center text-sm mb-4 text-[#5c5f77] dark:text-[#bac2de]">
-            Enter a URL to verify whether it uses certain external resources or contains JavaScript alerts.
+            Enter a URL to verify whether it uses certain external resources or
+            contains JavaScript alerts.
           </p>
         </CardHeader>
         <CardContent>
@@ -205,27 +210,27 @@ const handleShare = async () => {
                 onChange={(e) => setUrl(e.target.value)}
               />
               {(libraries.length > 0 || alerts.length > 0) && (
-                <button
-                  onClick={handleShare}
-                  className="text-[#4c4f69] dark:text-[#cdd6f4] hover:text-[#1e66f5] dark:hover:text-[#89b4fa] text-sm"
-                  title="Share Results"
-                >
+                <button onClick={handleShare} title="Share Results">
                   <FaShareAlt />
                 </button>
               )}
             </div>
-            {error && <p className="text-[#d20f39] dark:text-[#f38ba8] text-sm">{error}</p>}
+            {error && (
+              <p className="text-[#d20f39] dark:text-[#f38ba8] text-sm">
+                {error}
+              </p>
+            )}
             <Button
               onClick={handleVerify}
               className="w-full text-slate-50"
               disabled={loading}
             >
-              {loading ? 'Verifying...' : 'Verify'}
+              {loading ? "Verifying..." : "Verify"}
             </Button>
 
             {/* Show TabUI only when we have alerts */}
             {shouldShowTabUI ? (
-              <TabUI 
+              <TabUI
                 libraries={libraries}
                 alerts={alerts}
                 expanded={expanded}
@@ -235,67 +240,39 @@ const handleShare = async () => {
               />
             ) : (
               <>
-                {(!loading && searched && libraries.length === 0 && alerts.length === 0 && !error) && (
-                  <div className="text-center text-[#d20f39] dark:text-[#f38ba8] mt-4 flex items-center justify-center">
-                    <em-emoji shortcodes=":x:" set="apple" size="1em"></em-emoji>
-                    <span className="ml-2 mt-1">No resources or alerts detected</span>
-                  </div>
-                )}
+                {!loading &&
+                  searched &&
+                  libraries.length === 0 &&
+                  alerts.length === 0 &&
+                  !error && <EmptyState />}
 
                 {/* Display libraries in StandardUI */}
                 {libraries.map((lib, index) => {
-                  const cleanedLines = lib.lines.map(line => line.trimStart()).join('\n');
+                  const cleanedLines = lib.lines
+                    .map((line) => line.trimStart())
+                    .join("\n");
 
                   return (
-                    <Card key={index} className="mt-4">
-                      <button
-                        onClick={() => toggleExpand(lib.name)}
-                        className="w-full text-left"
-                      >
-                        <CardContent className="flex justify-between items-center p-4 hover:bg-[#e6e9ef] dark:hover:bg-[#313244] cursor-pointer">
-                          <div className="flex items-center font-bold">
-                            <span className="text-[#40a02b] dark:text-[#a6e3a1]">
-                              <em-emoji shortcodes=":white_check_mark:" set="apple"></em-emoji>
-                            </span>
-                            <span className="mt-1 ml-2 capitalize text-[#1e1e2e] dark:text-[#cdd6f4] opacity-100">{lib.name}</span>
-                          </div>
-                          <span 
-                            className="text-[#4c4f69] dark:text-[#cdd6f4] transition-transform duration-300"
-                            style={{ transform: expanded[lib.name] ? 'rotate(180deg)' : 'rotate(0deg)' }}
-                          >
-                            ▼
-                          </span>
-                        </CardContent>
-                      </button>
-                      <div className={`transition-all duration-300 ease-in-out ${expanded[lib.name] ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
-                        <div className="bg-[#313244] p-2 rounded-b-lg">
-                          <SyntaxHighlighter
-                            language={lib.syntaxHighlightType}
-                            style={dracula}
-                            customStyle={{
-                              backgroundColor: 'transparent',
-                              paddingTop: '1em',
-                              paddingBottom: '1em',
-                              fontSize: '0.875rem'
-                            }}
-                          >
-                            {cleanedLines}
-                          </SyntaxHighlighter>
-                        </div>
-                      </div>
-                    </Card>
+                    <ExpandableCard
+                      key={index}
+                      itemName={lib.name}
+                      displayName={lib.name}
+                      content={cleanedLines}
+                      expanded={expanded}
+                      toggleExpand={toggleExpand}
+                      language={lib.syntaxHighlightType}
+                    />
                   );
                 })}
               </>
             )}
           </div>
         </CardContent>
-      </Card> 
+      </Card>
       <Footer />
-      <HelpModal onSubmitUrl={handleVerify}/>
+      <HelpModal onSubmitUrl={handleVerify} />
     </div>
   );
 };
 
 export default StandardUI;
-
