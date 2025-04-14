@@ -8,8 +8,6 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import ExpandableCard from "../components/ui/ExpandableCard.js";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { dracula } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { FaShareAlt } from "react-icons/fa"; // Using react-icons for Font Awesome
 import data from "@emoji-mart/data";
 import { init } from "emoji-mart";

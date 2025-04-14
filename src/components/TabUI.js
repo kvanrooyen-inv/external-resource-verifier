@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import EmptyState from "./ui/EmptyState.js";
 import ExpandableCard from "./ui/ExpandableCard";
-import TabButton from "./ui/TabButton";
-import AlertBadge from "./ui/AlertBadge";
 import TabSelector from "./ui/TabSelector.js";
 
 const TabUI = ({
@@ -56,28 +54,47 @@ const TabUI = ({
           )}
         </div>
       )}
-
       {/* Alerts content */}
       {activeTab === "alerts" && (
         <div>
           {alerts.length === 0 ? (
             <EmptyState message="No alerts detected" />
           ) : (
-            alerts.map((alert, index) => (
-              <ExpandableCard
-                key={index}
-                itemName={`alert-${alert.id}`}
-                displayName={alert.name}
-                content={alert.code}
-                expanded={expanded}
-                toggleExpand={toggleExpand}
-                language="javascript"
-                type="alert"
-              />
-            ))
+            alerts.map((alert, index) => {
+              // Try to find the code content in various possible properties
+              let content = alert.code;
+
+              if (!content && alert.line) {
+                content = alert.line;
+              } else if (
+                !content &&
+                alert.lines &&
+                Array.isArray(alert.lines)
+              ) {
+                content = alert.lines.join("\n");
+              } else if (!content) {
+                content = "No content available";
+              }
+
+              // Make sure we have an ID or use index as fallback
+              const itemId = alert.id || index;
+
+              return (
+                <ExpandableCard
+                  key={index}
+                  itemName={`alert-${itemId}`}
+                  displayName={alert.name || `Alert ${index + 1}`}
+                  content={content}
+                  expanded={expanded}
+                  toggleExpand={toggleExpand}
+                  language="javascript"
+                  type="alert"
+                />
+              );
+            })
           )}
         </div>
-      )}
+      )}{" "}
     </div>
   );
 };
