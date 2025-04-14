@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import EmptyState from "./ui/EmptyState.js";
 import ExpandableCard from "./ui/ExpandableCard";
-import TabButton from "./ui/TabButton";
-import AlertBadge from "./ui/AlertBadge";
 import TabSelector from "./ui/TabSelector.js";
 
 const TabUI = ({

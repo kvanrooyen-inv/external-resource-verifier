@@ -6,8 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { dracula } from "react-syntax-highlighter/dist/esm/styles/prism";
 import Footer from "../components/ui/footer";
 import ExpandableCard from "../components/ui/ExpandableCard";
 import EmptyState from "../components/ui/EmptyState";
@@ -163,9 +161,6 @@ const ReportPage = () => {
     );
   }
 
-  // Get items for the active tab
-  const activeItems = activeTab === "resources" ? libraries : alerts;
-
   return (
     //TODO: This needs to be made into a component so that the placement of items can be reused.
     <div className="min-h-screen bg-[#e6e9ef] dark:bg-[#1e1e2e] flex items-center justify-center">
@@ -203,7 +198,6 @@ const ReportPage = () => {
                 librariesCount={libraries.length}
                 alertsCount={alerts.length}
               />
-
               {activeTab === "resources" && (
                 <div>
                   {libraries.length === 0 ? (
@@ -244,28 +238,37 @@ const ReportPage = () => {
                   )}
                 </div>
               )}
-
               {/* Alerts content */}
               {activeTab === "alerts" && (
                 <div>
                   {alerts.length === 0 ? (
                     <EmptyState message="No alerts detected" />
                   ) : (
-                    alerts.map((alert, index) => (
-                      <ExpandableCard
-                        key={index}
-                        itemName={`alert-${alert.id}`}
-                        displayName={alert.name}
-                        content={alert.code}
-                        expanded={expanded}
-                        toggleExpand={toggleExpand}
-                        language="javascript"
-                        type="alert"
-                      />
-                    ))
+                    alerts.map((alert, index) => {
+                      // Extract content from alert
+                      const content =
+                        alert.code ||
+                        alert.line ||
+                        (alert.lines
+                          ? alert.lines.join("\n")
+                          : "No content available");
+
+                      return (
+                        <ExpandableCard
+                          key={index}
+                          itemName={`alert-${alert.id || index}`}
+                          displayName={alert.name || `Alert ${index + 1}`}
+                          content={content}
+                          expanded={expanded}
+                          toggleExpand={toggleExpand}
+                          language="javascript"
+                          type="alert"
+                        />
+                      );
+                    })
                   )}
                 </div>
-              )}
+              )}{" "}
             </div>
           </CardContent>
         </Card>
