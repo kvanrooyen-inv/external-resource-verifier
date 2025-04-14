@@ -17,63 +17,54 @@ const ReportPage = () => {
   const [libraries, setLibraries] = useState([]);
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [expanded, setExpanded] = useState({});
-  const [activeTab, setActiveTab] = useState("resources");
-
-  // Add the switchTab function that was missing
-  const switchTab = (tab) => {
-    setActiveTab(tab);
-  };
+  const [activeTab, setActiveTab] = useState('libraries');
 
   // Get friendly OS name
   const getFriendlyOSName = (osName) => {
-    if (!osName) return "Unknown";
-
+    if (!osName) return 'Unknown';
+    
     // For Linux
-    if (osName.toLowerCase().includes("linux")) {
-      return "Linux";
+    if (osName.toLowerCase().includes('linux')) {
+      return 'Linux';
     }
-
+    
     // For Windows
-    if (osName.toLowerCase().includes("windows")) {
-      if (osName.includes("10")) return "Windows 10";
-      if (osName.includes("11")) return "Windows 11";
-      if (osName.includes("8")) return "Windows 8";
-      if (osName.includes("7")) return "Windows 7";
-      return "Windows";
+    if (osName.toLowerCase().includes('windows')) {
+      if (osName.includes('10')) return 'Windows 10';
+      if (osName.includes('11')) return 'Windows 11';
+      if (osName.includes('8')) return 'Windows 8';
+      if (osName.includes('7')) return 'Windows 7';
+      return 'Windows';
     }
-
+    
     // For macOS
-    if (
-      osName.toLowerCase().includes("darwin") ||
-      osName.toLowerCase().includes("mac")
-    ) {
-      if (osName.includes("10.15")) return "macOS Catalina";
-      if (osName.includes("11")) return "macOS Big Sur";
-      if (osName.includes("12")) return "macOS Monterey";
-      if (osName.includes("13")) return "macOS Ventura";
-      if (osName.includes("14")) return "macOS Sonoma";
-      return "macOS";
+    if (osName.toLowerCase().includes('darwin') || 
+        osName.toLowerCase().includes('mac')) {
+      if (osName.includes('10.15')) return 'macOS Catalina';
+      if (osName.includes('11')) return 'macOS Big Sur';
+      if (osName.includes('12')) return 'macOS Monterey';
+      if (osName.includes('13')) return 'macOS Ventura';
+      if (osName.includes('14')) return 'macOS Sonoma';
+      return 'macOS';
     }
-
+    
     return osName;
   };
 
   useEffect(() => {
     const fetchReport = async () => {
       try {
-        const response = await fetch(
-          `/.netlify/functions/get-report/${reportId}`,
-        );
+        const response = await fetch(`/.netlify/functions/get-report/${reportId}`);
         if (!response.ok) {
-          throw new Error("Report not found");
+          throw new Error('Report not found');
         }
         const data = await response.json();
-
+        
         // Set the full report data
         setReport(data);
-
+        
         // Process libraries and alerts
         if (data.detectedLibraries) {
           // Check if we have a separate detectedAlerts field
@@ -84,29 +75,26 @@ const ReportPage = () => {
             // If not, filter libraries vs alerts from the combined array
             const libs = [];
             const alertItems = [];
-
-            data.detectedLibraries.forEach((item) => {
+            
+            data.detectedLibraries.forEach(item => {
               // Check if this is an alert (by name or other indicator)
-              if (
-                item.name &&
-                (item.name.toLowerCase().includes("alert") ||
-                  (item.line && item.line.toLowerCase().includes("alert(")))
-              ) {
+              if (item.name && (
+                  item.name.toLowerCase().includes('alert') || 
+                  (item.line && item.line.toLowerCase().includes('alert('))
+                )) {
                 alertItems.push(item);
               } else {
                 libs.push(item);
               }
             });
-
+            
             setLibraries(libs);
             setAlerts(alertItems);
           }
         }
       } catch (err) {
-        console.error("Error fetching report:", err);
-        setError(
-          "Unable to load the report. It may have expired or been removed.",
-        );
+        console.error('Error fetching report:', err);
+        setError('Unable to load the report. It may have expired or been removed.');
       } finally {
         setLoading(false);
       }
@@ -122,12 +110,11 @@ const ReportPage = () => {
   };
 
   const getLanguage = (libName, code) => {
-    if (libName && libName.toLowerCase().includes("alert")) return "javascript";
-    if (code && code.toLowerCase().includes("alert(")) return "javascript";
-    if (libName && libName.toLowerCase().includes("webgl")) return "javascript";
-    if (libName && libName.toLowerCase().includes("javascript"))
-      return "javascript";
-    return "html";
+    if (libName && libName.toLowerCase().includes('alert')) return 'javascript';
+    if (code && code.toLowerCase().includes('alert(')) return 'javascript';
+    if (libName && libName.toLowerCase().includes('webgl')) return 'javascript';
+    if (libName && libName.toLowerCase().includes('javascript')) return 'javascript';
+    return 'html';
   };
 
   // For debugging - log what we have
@@ -152,42 +139,37 @@ const ReportPage = () => {
       <div className="min-h-screen bg-[#e6e9ef] dark:bg-[#1e1e2e] flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardContent className="p-6">
-            <p className="text-[#d20f39] dark:text-[#f38ba8] text-center">
-              {error}
-            </p>
+            <p className="text-[#d20f39] dark:text-[#f38ba8] text-center">{error}</p>
           </CardContent>
         </Card>
       </div>
     );
   }
 
-  return (
-    //TODO: This needs to be made into a component so that the placement of items can be reused.
+return (
     <div className="min-h-screen bg-[#e6e9ef] dark:bg-[#1e1e2e] flex items-center justify-center">
       {report && (
-        <Card>
+        <Card className="w-full max-w-md bg-[#eff1f5] dark:bg-[#181825] border-[#9ca0b0] dark:border-[#313244]">
           <CardHeader>
-            <CardTitle>External Resource Report</CardTitle>
+            <CardTitle className="text-center text-2xl">
+              External Resource Report
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            {/* TODO: This needs to be made into a component as well. */}
             <div className="space-y-4">
               {/* Information Box */}
               <div className="bg-[#e6e9ef] dark:bg-[#313244] p-4 rounded-md text-[#4c4f69] dark:text-[#cdd6f4]">
-                <p>
-                  <strong>OS:</strong> {getFriendlyOSName(report.osName)}
-                </p>
+                <p><strong>OS:</strong> {getFriendlyOSName(report.osName)}</p>
                 <p className="flex">
-                  <strong className="flex-shrink-0">URL:</strong>
+                  <strong className="flex-shrink-0">URL:</strong>{' '}
                   <a
                     href={report.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#1e66f5] dark:text-[#89b4fa] underline
-                    truncate ml-1"
+                    className="text-[#1e66f5] dark:text-[#89b4fa] underline truncate ml-1"
                     title={report.url}
                   >
-                    {report.url}>
+                    {report.url}
                   </a>
                 </p>
               </div>
@@ -207,37 +189,7 @@ const ReportPage = () => {
                       // Handle case where lines might not exist
                       let content = "";
 
-                      if (lib.lines && Array.isArray(lib.lines)) {
-                        // Remove leading whitespace from each line
-                        content = lib.lines
-                          .map((line) => line.trimStart())
-                          .join("\n");
-                      } else if (lib.code) {
-                        content = lib.code;
-                      } else if (lib.line) {
-                        content = lib.line;
-                      } else {
-                        content = "No content available";
-                      }
 
-                      return (
-                        <ExpandableCard
-                          key={index}
-                          itemName={lib.name}
-                          displayName={lib.name}
-                          content={content}
-                          expanded={expanded}
-                          toggleExpand={toggleExpand}
-                          language={
-                            lib.syntaxHighlightType ||
-                            getLanguage(lib.name, content)
-                          }
-                        />
-                      );
-                    })
-                  )}
-                </div>
-              )}
               {/* Alerts content */}
               {activeTab === "alerts" && (
                 <div>
@@ -279,6 +231,7 @@ const ReportPage = () => {
                   )}
                 </div>
               )}{" "}
+
             </div>
           </CardContent>
         </Card>
