@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ThemeToggle from './components/ThemeToggle';
-import StandardUI from './components/StandardUI';
+import Dashboard from './components/Dashboard';
 import ReportPage from './components/ReportPage';
 import NotificationSystem from './components/NotificationSystem.js';
 
@@ -12,7 +12,7 @@ function App() {
         <ThemeToggle />
         <NotificationSystem />
         <Routes>
-          <Route path="/" element={<StandardUI />} />
+          <Route path="/" element={<Dashboard />} />
           <Route path="/report/:reportId" element={<ReportPage />} />
         </Routes>
       </div>
