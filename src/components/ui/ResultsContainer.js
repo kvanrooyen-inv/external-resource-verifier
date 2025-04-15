@@ -15,7 +15,7 @@ const ResultsContainer = ({ libraries, alerts }) => {
   
   return (
     <div className="space-y-4">
-      <h2 className="text-white text-xl font-medium mb-4">Results</h2>
+      <h2 className="text-white text-xl font-medium mb-2 mt-2">Results</h2>
       
       {/* External Resources Section */}
       {libraries.length > 0 && (
