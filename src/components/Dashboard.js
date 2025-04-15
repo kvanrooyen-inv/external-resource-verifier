@@ -99,7 +99,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#171923] flex flex-col">
+    <div className="min-h-screen bg-[#dce0e8] dark:bg-[#1a1b26] flex flex-col">
       {/* Header - URL input and verify button */}
       <DashboardHeader 
         url={url}
@@ -110,7 +110,7 @@ const Dashboard = () => {
       />
       
       {/* Main Content */}
-      <main className="mx-auto w-4/5 max-w-5xl">         
+      <main className="mx-auto w-4/5 max-w-5xl pb-16">         
           {searched && !loading && (
             <ResultsContainer 
               libraries={libraries}

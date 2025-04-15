@@ -7,33 +7,33 @@ const AlertsCard = ({ alerts }) => {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="bg-[#1a202c] rounded-lg overflow-hidden">
+    <div className="bg-[#e6e7ed] dark:bg-[#414868] rounded-lg overflow-hidden">
       {/* Header */}
       <div
         className="flex items-center justify-between px-4 py-3 cursor-pointer"
         onClick={() => setExpanded(!expanded)}
       >
         <div className="flex items-center">
-          <span className="mr-3 text-yellow-500">
+          <span className="mr-3 text-[#8c4351] dark:text-[#f7768e]">
             <FiAlertTriangle />
           </span>
-          <span className="text-white font-medium">JavaScript Alerts</span>
+          <span className="text-[#343b58] dark:text-[#e6e7ed] font-semibold">JavaScript Alerts</span>
         </div>
         <div className="flex items-center">
-          <span className="bg-[#252a37] text-gray-300 px-2 py-1 rounded-full text-xs mr-3">
+          <span className="bg-[#6c6e75] dark:bg-[#1a1b26] text-[#e6e7ed] dark:text-[#c0caf5] px-2 py-1 rounded-full text-xs mr-3 font-semibold">
             {alerts.length}
           </span>
           {expanded ? (
-            <FiChevronDown className="text-gray-400" />
+            <FiChevronDown className="text-[#343b58] dark:text-[#9aa5ce]" />
           ) : (
-            <FiChevronRight className="text-gray-400" />
+            <FiChevronRight className="text-[#343b58] dark:text-[#9aa5ce]" />
           )}
         </div>
       </div>
 
       {/* Expanded Content */}
       {expanded && (
-        <div className="border-t border-[#2d3748]">
+        <div>
           {alerts.map((alert, index) => (
             <AlertItem key={index} alert={alert} />
           ))}
@@ -47,23 +47,23 @@ const AlertItem = ({ alert }) => {
   const [detailsExpanded, setDetailsExpanded] = useState(false);
 
   return (
-    <div className="border-b border-[#2d3748] last:border-b-0">
+    <div>
       <div
         className="flex items-center justify-between px-4 py-3 cursor-pointer"
         onClick={() => setDetailsExpanded(!detailsExpanded)}
       >
-        <span className="text-gray-300">{alert.name}</span>
+        <span className="text-[#343b58] dark:text-[#e6e7ed]">{alert.name}</span>
         <div className="flex items-center">
           {detailsExpanded ? (
-            <FiChevronDown className="text-gray-400" />
+            <FiChevronDown className="text-[#343b58] dark:text-[#9aa5ce]" />
           ) : (
-            <FiChevronRight className="text-gray-400" />
+            <FiChevronRight className="text-[#343b58] dark:text-[#9aa5ce]" />
           )}
         </div>
       </div>
 
       {detailsExpanded && (
-        <div className="p-4 rounded-b-lg dark:bg-[#0f1117]">
+        <div className="bg-[#343b58] dark:bg-[#24283b] p-2 rounded-b-lg">
           <SyntaxHighlighter
             language="javascript"
             style={dracula}

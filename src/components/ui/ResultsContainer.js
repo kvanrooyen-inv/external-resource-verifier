@@ -1,21 +1,20 @@
 import React from "react";
 import ResourcesCard from "./ResourcesCard";
 import AlertsCard from "./AlertsCard";
+import EmptyState from "./EmptyState";
 
 const ResultsContainer = ({ libraries, alerts }) => {
   const hasResults = libraries.length > 0 || alerts.length > 0;
   
   if (!hasResults) {
     return (
-      <div className="bg-[#1a202c] rounded-lg p-10 text-gray-400 text-center">
-        <p>No external resources or JavaScript alerts were detected on this website.</p>
-      </div>
+      <EmptyState />
     );
   }
   
   return (
     <div className="space-y-4">
-      <h2 className="text-white text-xl font-medium mb-2 mt-2">Results</h2>
+      <h2 className="text-[#343b58] dark:text-[#c0caf5] text-xl font-medium mb-2 mt-2">Results</h2>
       
       {/* External Resources Section */}
       {libraries.length > 0 && (
