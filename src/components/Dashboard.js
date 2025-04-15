@@ -110,7 +110,7 @@ const Dashboard = () => {
       />
       
       {/* Main Content */}
-      <main className="flex-grow py-4">         
+      <main className="mx-auto w-4/5 max-w-5xl">         
           {searched && !loading && (
             <ResultsContainer 
               libraries={libraries}
