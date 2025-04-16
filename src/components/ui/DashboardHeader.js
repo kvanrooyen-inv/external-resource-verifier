@@ -10,7 +10,7 @@ const DashboardHeader = ({
   error 
 }) => {
   return (
-    <header className="bg-[#dce0e8] dark:bg-[#1a1b26] py-6 w-full">
+    <div className="w-full transition-all duration-700 ease-in-out">
       <div className="mx-auto w-4/5 max-w-5xl">
         <h1 className="text-[#343b58] dark:text-[#c0caf5] text-2xl font-bold mb-2">External Resource Checker</h1>
         <p className="text-sm text-[#6c6e75] dark:text-[#9aa5ce] mb-4">Analyze websites for external resources and potential issues</p>
@@ -36,7 +36,7 @@ const DashboardHeader = ({
           <p className="text-[#8c4351] dark:text-[#f7768e] mt-2 text-sm">{error}</p>
         )}
       </div>
-    </header>
+    </div>
   );
 };
 

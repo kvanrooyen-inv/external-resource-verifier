@@ -23,6 +23,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [libraryRules, setLibraryRules] = useState([]);
+  const [headerPosition, setHeaderPosition] = useState("centered"); // 'centered' or 'top'
 
   const { theme, toggleTheme } = useContext(ThemeContext);
   
@@ -84,7 +85,6 @@ const Dashboard = () => {
     setLazyLoadedElements([]);
     setFavicon({ exists: false, icons: [] });
     setFormValidation({ forms: [] });
-    setSearched(false);
 
     if (!url.trim() || !isValidURL(url)) {
       setError("Please enter a valid URL.");
@@ -93,6 +93,9 @@ const Dashboard = () => {
 
     setLoading(true);
     try {
+      // Move header up before fetching
+      setHeaderPosition("top");
+      
       // Fetch the HTML content using your Netlify function
       const html = await fetchUrlContent(url);
       
@@ -123,27 +126,29 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#dce0e8] dark:bg-[#1a1b26] flex flex-col">
-      {/* Header - URL input and verify button */}
-      <DashboardHeader 
-        url={url}
-        setUrl={setUrl}
-        handleVerify={handleVerify}
-        loading={loading}
-        error={error}
-      />
+      {/* Header with dynamic position based on state */}
+      <div className={`w-full transition-all duration-700 ease-in-out ${headerPosition === "centered" ? "flex-grow flex items-center" : ""}`}>
+        <DashboardHeader 
+          url={url}
+          setUrl={setUrl}
+          handleVerify={handleVerify}
+          loading={loading}
+          error={error}
+        />
+      </div>
       
       {/* Main Content */}
-      <main className="mx-auto w-4/5 max-w-5xl pb-16">         
-          {searched && !loading && (
-            <ResultsContainer 
-              libraries={libraries}
-              alerts={alerts}
-              ariaLabels={ariaLabels}
-              lazyLoadedElements={lazyLoadedElements}
-              favicon={favicon}
-              formValidation={formValidation}
-            />
-          )}
+      <main className={`mx-auto w-4/5 max-w-5xl pb-16 transition-all duration-700 ease-in-out ${headerPosition === "centered" && !searched ? "opacity-0 h-0" : "opacity-100"}`}>         
+        {searched && !loading && (
+          <ResultsContainer 
+            libraries={libraries}
+            alerts={alerts}
+            ariaLabels={ariaLabels}
+            lazyLoadedElements={lazyLoadedElements}
+            favicon={favicon}
+            formValidation={formValidation}
+          />
+        )}
       </main>
       
       <Footer />
