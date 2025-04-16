@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { FiChevronDown, FiChevronRight, FiTag } from "react-icons/fi";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { dracula } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -70,7 +70,6 @@ const SimplifiedListView = ({ ariaLabels }) => {
 const AttributeItem = ({ item }) => {
   const [detailsExpanded, setDetailsExpanded] = useState(false);
   
-  const elementType = item.elementType || item.element.match(/<([a-z0-9]+)/i)?.[1] || 'element';
   const attributeName = item.attribute;
   const attributeValue = item.value || '';
   
