@@ -12,7 +12,7 @@ const DashboardHeader = ({
   return (
     <div className="w-full transition-all duration-700 ease-in-out">
       <div className="mx-auto w-4/5 max-w-5xl">
-        <h1 className="text-[#343b58] dark:text-[#c0caf5] text-2xl font-bold mb-2">External Resource Checker</h1>
+        <h1 className="text-[#343b58] dark:text-[#c0caf5] text-2xl font-bold mb-1 mt-4">External Resource Checker</h1>
         <p className="text-sm text-[#6c6e75] dark:text-[#9aa5ce] mb-4">Analyze websites for external resources and potential issues</p>
         
         <div className="flex gap-2">
