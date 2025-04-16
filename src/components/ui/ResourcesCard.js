@@ -33,11 +33,25 @@ const ResourcesCard = ({ libraries }) => {
 
       {/* Expanded Content */}
       {expanded && (
-        <div>
-          {libraries.map((library, index) => (
-            <LibraryItem key={index} library={library} />
-          ))}
-        </div>
+        <>
+          {/* Content Display */}
+          <div className="max-h-96 overflow-y-auto">
+            {libraries.length > 0 ? (
+              libraries.map((library, index) => (
+                <LibraryItem key={index} library={library} />
+              ))
+            ) : (
+              <div className="px-4 py-3 text-[#343b58] dark:text-[#e6e7ed]">
+                No external resources found on this page.
+              </div>
+            )}
+          </div>
+          
+          {/* Summary Footer */}
+          <div className="px-4 py-2 border-t border-[#c9cacf] dark:border-[#343b58] text-sm text-[#343b58] dark:text-[#9aa5ce]">
+            {libraries.length} resources displayed
+          </div>
+        </>
       )}
     </div>
   );
@@ -47,12 +61,17 @@ const LibraryItem = ({ library }) => {
   const [detailsExpanded, setDetailsExpanded] = useState(false);
 
   return (
-    <div>
+    <div className="border-t border-[#c9cacf] dark:border-[#343b58]">
       <div
-        className="flex items-center justify-between px-4 py-3 cursor-pointer"
+        className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-[#d1d5e3] dark:hover:bg-[#363b54]"
         onClick={() => setDetailsExpanded(!detailsExpanded)}
       >
-        <span className="text-[#343b58] dark:text-[#e6e7ed]">{library.name}</span>
+        <div className="flex-grow">
+          <span className="text-[#343b58] dark:text-[#e6e7ed]">{library.name}</span>
+          <div className="text-xs text-[#6c6e75] dark:text-[#9aa5ce]">
+            Line {library.lineNumber}
+          </div>
+        </div>
         <div className="flex items-center">
           {detailsExpanded ? (
             <FiChevronDown className="text-[#343b58] dark:text-[#9aa5ce]" />

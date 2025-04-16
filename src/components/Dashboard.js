@@ -13,6 +13,10 @@ const Dashboard = () => {
   const [url, setUrl] = useState("");
   const [libraries, setLibraries] = useState([]);
   const [alerts, setAlerts] = useState([]);
+  const [ariaLabels, setAriaLabels] = useState([]);
+  const [lazyLoadedElements, setLazyLoadedElements] = useState([]);
+  const [favicon, setFavicon] = useState({ exists: false, icons: [] });
+  const [formValidation, setFormValidation] = useState({ forms: [] });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
@@ -72,6 +76,10 @@ const Dashboard = () => {
     setError("");
     setLibraries([]);
     setAlerts([]);
+    setAriaLabels([]);
+    setLazyLoadedElements([]);
+    setFavicon({ exists: false, icons: [] });
+    setFormValidation({ forms: [] });
     setSearched(false);
 
     if (!url.trim() || !isValidURL(url)) {
@@ -85,10 +93,21 @@ const Dashboard = () => {
       const html = await fetchUrlContent(url);
       
       // Process the HTML content using your analyzer
-      const { detectedLibraries, detectedAlerts } = analyzeWebsite(html, libraryRules);
+      const { 
+        detectedLibraries, 
+        detectedAlerts, 
+        detectedAriaLabels,
+        detectedLazyLoading,
+        detectedFavicon,
+        detectedFormValidation
+      } = analyzeWebsite(html, libraryRules);
       
       setLibraries(detectedLibraries);
       setAlerts(detectedAlerts);
+      setAriaLabels(detectedAriaLabels || []);
+      setLazyLoadedElements(detectedLazyLoading || []);
+      setFavicon(detectedFavicon || { exists: false, icons: [] });
+      setFormValidation(detectedFormValidation || { forms: [] });
       setSearched(true);
     } catch (e) {
       console.error(e);
@@ -115,6 +134,10 @@ const Dashboard = () => {
             <ResultsContainer 
               libraries={libraries}
               alerts={alerts}
+              ariaLabels={ariaLabels}
+              lazyLoadedElements={lazyLoadedElements}
+              favicon={favicon}
+              formValidation={formValidation}
             />
           )}
       </main>
@@ -123,5 +146,4 @@ const Dashboard = () => {
     </div>
   );
 };
-
 export default Dashboard;
