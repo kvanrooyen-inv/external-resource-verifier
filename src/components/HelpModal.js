@@ -9,7 +9,7 @@ const Dialog = ({ children, open, onOpenChange }) => (
     onClick={() => onOpenChange(false)}
   >
     <div
-      className="bg-white dark:bg-[#1e1e2e] rounded-lg shadow-lg max-w-md w-full mx-4"
+      className="bg-white dark:bg-[#1e1e2e] rounded-lg shadow-lg max-w-lg w-full mx-4"
       onClick={(e) => e.stopPropagation()}
     >
       {children}
@@ -151,7 +151,7 @@ const HelpModal = ({ onSubmitUrl, theme, toggleTheme }) => {
       </button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="w-md">
           <DialogHeader>
             <DialogTitle>Help & About</DialogTitle>
           </DialogHeader>
@@ -226,7 +226,7 @@ const HelpModal = ({ onSubmitUrl, theme, toggleTheme }) => {
                 Version
               </h3>
               <p className="text-sm text-[#4c4f69] dark:text-[#bac2de]">
-                v1.0.1
+                v2.0.0
               </p>
             </div>
           </div>
