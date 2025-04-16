@@ -1,15 +1,16 @@
 import React from "react";
-import ThemeToggle from "./components/ThemeToggle";
+import { ThemeProvider } from "./context/ThemeContext.js";
 import Dashboard from "./components/Dashboard";
 import NotificationSystem from "./components/NotificationSystem.js";
 
 function App() {
   return (
-    <div className="min-h-screen bg-background-color text-text-color">
-      <ThemeToggle />
-      <NotificationSystem />
-      <Dashboard />
-    </div>
+    <ThemeProvider>
+      <div className="min-h-screen bg-background-color text-text-color">
+        <NotificationSystem />
+        <Dashboard />
+      </div>
+    </ThemeProvider>
   );
 }
 

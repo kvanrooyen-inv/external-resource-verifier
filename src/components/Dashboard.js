@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import data from "@emoji-mart/data";
 import { init } from "emoji-mart";
 import DashboardHeader from "./ui/DashboardHeader";
@@ -6,6 +6,8 @@ import Footer from "./ui/footer";
 import ResultsContainer from "./ui/ResultsContainer";
 import { client } from "../lib/sanity";
 import { analyzeWebsite } from "../lib/analyzer";
+import HelpModal from "./HelpModal";
+import { ThemeContext } from "../context/ThemeContext";
 
 init({data});
 
@@ -21,6 +23,8 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [libraryRules, setLibraryRules] = useState([]);
+
+  const { theme, toggleTheme } = useContext(ThemeContext);
   
   useEffect(() => {
     const fetchLibraryRules = async () => {
@@ -143,6 +147,7 @@ const Dashboard = () => {
       </main>
       
       <Footer />
+      <HelpModal onSubmitUrl={handleVerify} theme={theme} toggleTheme={toggleTheme} />
     </div>
   );
 };
