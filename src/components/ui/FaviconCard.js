@@ -6,6 +6,11 @@ import { dracula } from "react-syntax-highlighter/dist/esm/styles/prism";
 const FaviconCard = ({ favicon = { exists: false, icons: [] } }) => {
   const [expanded, setExpanded] = useState(false);
   
+  // Don't render the component if no favicon exists
+  if (!favicon.exists || favicon.icons.length === 0) {
+    return null;
+  }
+  
   return (
     <div className="bg-[#e6e7ed] dark:bg-[#414868] rounded-lg overflow-hidden">
       {/* Header */}
@@ -36,21 +41,12 @@ const FaviconCard = ({ favicon = { exists: false, icons: [] } }) => {
         <>
           {/* Content Display */}
           <div className="max-h-96 overflow-y-auto">
-            {favicon.exists ? (
-              <FaviconList icons={favicon.icons} />
-            ) : (
-              <div className="px-4 py-3 text-[#343b58] dark:text-[#e6e7ed]">
-                No favicon detected on this page.
-              </div>
-            )}
+            <FaviconList icons={favicon.icons} />
           </div>
           
           {/* Summary Footer */}
           <div className="px-4 py-2 border-t border-[#c9cacf] dark:border-[#343b58] text-sm text-[#343b58] dark:text-[#9aa5ce]">
-            {favicon.exists 
-              ? `${favicon.icons.length} favicon element${favicon.icons.length !== 1 ? 's' : ''} found`
-              : "No favicon detected"
-            }
+            {`${favicon.icons.length} favicon element${favicon.icons.length !== 1 ? 's' : ''} found`}
           </div>
         </>
       )}
