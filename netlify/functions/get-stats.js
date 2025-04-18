@@ -23,8 +23,8 @@ exports.handler = async (event) => {
   };
 
   try {
-    // Get all records from dev_test table
-    const { data, error } = await supabase.from("dev_test").select("*");
+    // Get all records from site_stats table
+    const { data, error } = await supabase.from("site_stats").select("*");
 
     if (error) {
       console.error("Supabase error:", error);
