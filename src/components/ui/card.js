@@ -3,7 +3,7 @@ import React from "react";
 export const Card = ({ children, className = "" }) => {
   return (
     <div
-      className={`rounded-xl shadow-md max-w-xl bg-[#e6e7ed] dark:bg-[#1a1b26] ${className}`}
+      className={`rounded-xl shadow-md bg-[#e6e7ed] dark:bg-[#1a1b26] ${className}`}
     >
       {children}
     </div>

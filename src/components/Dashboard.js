@@ -85,12 +85,12 @@ const Dashboard = () => {
     setLazyLoadedElements([]);
     setFavicon({ exists: false, icons: [] });
     setFormValidation({ forms: [] });
-
+  
     if (!url.trim() || !isValidURL(url)) {
       setError("Please enter a valid URL.");
       return;
     }
-
+  
     setLoading(true);
     try {
       // Move header up before fetching
@@ -116,6 +116,36 @@ const Dashboard = () => {
       setFavicon(detectedFavicon || { exists: false, icons: [] });
       setFormValidation(detectedFormValidation || { forms: [] });
       setSearched(true);
+  
+      // Save analysis data to Supabase
+      try {
+        const osName = navigator.platform || "Unknown";
+        const analysisData = {
+          url: url,
+          detectedLibraries: detectedLibraries,
+          detectedAlerts: detectedAlerts,
+          detectedAriaLabels: detectedAriaLabels, 
+          detectedLazyLoading: detectedLazyLoading,
+          detectedFormValidation: detectedFormValidation,
+          osName: osName
+        };
+  
+        const response = await fetch('/.netlify/functions/save-report', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(analysisData)
+        });
+  
+        const result = await response.json();
+        if (result.success) {
+          console.log("Analysis data saved successfully");
+        }
+      } catch (saveError) {
+        console.error("Error saving analysis data:", saveError);
+        // We don't set the main error here since the analysis was successful
+      }
     } catch (e) {
       console.error(e);
       handleError(e);
