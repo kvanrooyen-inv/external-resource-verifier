@@ -46,7 +46,7 @@ exports.handler = async (event) => {
     
     // Store the analysis data in Supabase
     const { data: insertedData, error } = await supabase
-      .from('dev_test')
+      .from('site_stats')
       .insert(recordData)
       .select();
     
