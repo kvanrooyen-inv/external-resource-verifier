@@ -139,57 +139,73 @@ export const detectAriaLabels = (html) => {
  */
 export const detectLazyLoading = (html) => {
   const lazyLoaded = [];
-  const lines = html.split('\n');
   
-  lines.forEach((line, lineIndex) => {
-    // Check for loading="lazy" attribute
-    const lazyLoadingRegex = /<([a-z][a-z0-9]*)[^>]*\sloading\s*=\s*["']lazy["'][^>]*>/i;
-    const lazyMatch = line.match(lazyLoadingRegex);
+  // Modified regex patterns with more flexibility
+  const lazyLoadingRegex = /loading\s*=\s*["']lazy["']/i;
+  const dataSrcRegex = /data-src\s*=\s*["'][^"']*["']/i;
+  const intersectionObserverRegex = /IntersectionObserver/i;
+  
+  // First try to find all image, iframe, or video tags
+  const elementRegex = /<(img|iframe|video)([^>]*)>/gi;
+  let elementMatch;
+  
+  while ((elementMatch = elementRegex.exec(html)) !== null) {
+    const fullTag = elementMatch[0];
+    const elementType = elementMatch[1];
+    const attributes = elementMatch[2];
     
-    // Check for data-src attribute (common in lazy loading libraries)
-    const dataSrcRegex = /<([a-z][a-z0-9]*)[^>]*\sdata-src\s*=\s*["']([^"']*)["'][^>]*>/i;
-    const dataSrcMatch = line.match(dataSrcRegex);
-    
-    // Check for IntersectionObserver usage (in script tags)
-    const intersectionObserverRegex = /IntersectionObserver/i;
-    const observerMatch = line.match(intersectionObserverRegex);
-    
-    if (lazyMatch) {
+    // Check if this element has lazy loading
+    if (lazyLoadingRegex.test(attributes)) {
       lazyLoaded.push({
         id: lazyLoaded.length,
         type: 'native',
-        element: line.trim(),
-        elementType: lazyMatch[1],
-        lineNumber: lineIndex + 1,
-        name: `Native lazy loading for <${lazyMatch[1]}>`
+        element: fullTag.trim(),
+        elementType: elementType,
+        lineNumber: getLineNumber(html, elementMatch.index),
+        name: `Native lazy loading for <${elementType}>`
       });
     }
     
-    if (dataSrcMatch) {
+    // Check for data-src attribute
+    if (dataSrcRegex.test(attributes)) {
       lazyLoaded.push({
         id: lazyLoaded.length,
         type: 'data-src',
-        element: line.trim(),
-        elementType: dataSrcMatch[1],
-        lineNumber: lineIndex + 1,
-        name: `data-src lazy loading for <${dataSrcMatch[1]}>`
+        element: fullTag.trim(),
+        elementType: elementType,
+        lineNumber: getLineNumber(html, elementMatch.index),
+        name: `data-src lazy loading for <${elementType}>`
       });
     }
+  }
+  
+  // Check for IntersectionObserver usage separately
+  const scriptRegex = /<script[^>]*>([\s\S]*?)<\/script>/gi;
+  let scriptMatch;
+  
+  while ((scriptMatch = scriptRegex.exec(html)) !== null) {
+    const scriptContent = scriptMatch[1];
     
-    if (observerMatch) {
+    if (intersectionObserverRegex.test(scriptContent)) {
       lazyLoaded.push({
         id: lazyLoaded.length,
         type: 'intersection-observer',
-        element: line.trim(),
+        element: scriptMatch[0].substring(0, 100) + '...',  // First 100 chars for brevity
         elementType: 'script',
-        lineNumber: lineIndex + 1,
+        lineNumber: getLineNumber(html, scriptMatch.index),
         name: 'IntersectionObserver lazy loading'
       });
     }
-  });
+  }
   
   return lazyLoaded;
 };
+
+// Helper function to get line number from character index
+function getLineNumber(html, index) {
+  const linesUntilIndex = html.substring(0, index).split('\n');
+  return linesUntilIndex.length;
+}
 
 /**
  * Detect favicon information in HTML content
