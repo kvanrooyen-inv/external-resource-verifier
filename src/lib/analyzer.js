@@ -13,6 +13,7 @@ export const analyzeWebsite = (html, libraryRules) => {
   const detectedLazyLoading = detectLazyLoading(html);
   const detectedFavicon = detectFavicon(html);
   const detectedFormValidation = detectFormValidation(html);
+  const detectedMetaTags = detectMetaTags(html);
   
   return {
     detectedLibraries,
@@ -20,7 +21,8 @@ export const analyzeWebsite = (html, libraryRules) => {
     detectedAriaLabels,
     detectedLazyLoading,
     detectedFavicon,
-    detectedFormValidation
+    detectedFormValidation,
+    detectedMetaTags
   };
 };
 
@@ -327,4 +329,105 @@ export const detectFormValidation = (html) => {
   }
   
   return formValidation;
+
+};
+
+/**
+ * Detect meta tags in HTML content
+ * @param {string} html - The HTML content
+ * @returns {Array} - Array of detected meta tags
+ */
+export const detectMetaTags = (html) => {
+  // Initialize empty array
+  const metaTags = [];
+  
+  const lines = html.split('\n');
+  
+  // Regex patterns for different types of meta tags
+  const metaTagRegex = /<meta[^>]*>/gi;
+  const nameAttrRegex = /name\s*=\s*["']([^"']*)["']/i;
+  const propertyAttrRegex = /property\s*=\s*["']([^"']*)["']/i;
+  const contentAttrRegex = /content\s*=\s*["']([^"']*)["']/i;
+  const charsetAttrRegex = /charset\s*=\s*["']([^"']*)["']/i;
+  const httpEquivAttrRegex = /http-equiv\s*=\s*["']([^"']*)["']/i;
+  
+  // Categorize meta tags for easy identification
+  const metaCategories = {
+    'viewport': 'Viewport',
+    'description': 'Description',
+    'keywords': 'Keywords',
+    'author': 'Author',
+    'robots': 'Robots',
+    'og:': 'Open Graph',
+    'twitter:': 'Twitter Card',
+    'charset': 'Character Set',
+    'http-equiv': 'HTTP-Equiv'
+  };
+  
+  lines.forEach((line, lineIndex) => {
+    // Find all meta tags in the current line
+    const metaMatches = [...line.matchAll(metaTagRegex)];
+    
+    if (metaMatches.length > 0) {
+      metaMatches.forEach(match => {
+        const metaTag = match[0];
+        
+        // Extract attributes
+        const nameMatch = metaTag.match(nameAttrRegex);
+        const propertyMatch = metaTag.match(propertyAttrRegex);
+        const contentMatch = metaTag.match(contentAttrRegex);
+        const charsetMatch = metaTag.match(charsetAttrRegex);
+        const httpEquivMatch = metaTag.match(httpEquivAttrRegex);
+        
+        let tagName = '';
+        let tagType = 'standard';
+        let tagContent = contentMatch ? contentMatch[1] : '';
+        
+        // Determine tag type and name
+        if (nameMatch) {
+          tagName = nameMatch[1];
+          
+          // Categorize based on common meta tag names
+          for (const [key, value] of Object.entries(metaCategories)) {
+            if (tagName.toLowerCase().includes(key.toLowerCase())) {
+              tagType = value;
+              break;
+            }
+          }
+        } else if (propertyMatch) {
+          tagName = propertyMatch[1];
+          
+          // Categorize based on property prefixes
+          for (const [key, value] of Object.entries(metaCategories)) {
+            if (tagName.toLowerCase().includes(key.toLowerCase())) {
+              tagType = value;
+              break;
+            }
+          }
+        } else if (charsetMatch) {
+          tagName = 'charset';
+          tagContent = charsetMatch[1];
+          tagType = 'Character Set';
+        } else if (httpEquivMatch) {
+          tagName = httpEquivMatch[1];
+          tagType = 'HTTP-Equiv';
+        }
+        
+        // Add to array
+        metaTags.push({
+          id: metaTags.length,
+          name: tagName || 'Unnamed Meta Tag',
+          type: tagType,
+          content: tagContent,
+          element: metaTag.trim(),
+          lineNumber: lineIndex + 1
+        });
+      });
+    }
+  });
+  
+  // Add debug logs
+  console.log(`Detected ${metaTags.length} meta tags`);
+  
+  return metaTags;
 };

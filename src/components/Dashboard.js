@@ -24,6 +24,7 @@ const Dashboard = () => {
   const [searched, setSearched] = useState(false);
   const [libraryRules, setLibraryRules] = useState([]);
   const [headerPosition, setHeaderPosition] = useState("centered"); // 'centered' or 'top'
+  const [metaTags, setMetaTags] = useState([]);
 
   const { theme, toggleTheme } = useContext(ThemeContext);
   
@@ -85,6 +86,7 @@ const Dashboard = () => {
     setLazyLoadedElements([]);
     setFavicon({ exists: false, icons: [] });
     setFormValidation({ forms: [] });
+    setMetaTags([]);
   
     if (!url.trim() || !isValidURL(url)) {
       setError("Please enter a valid URL.");
@@ -106,6 +108,7 @@ const Dashboard = () => {
         detectedAriaLabels,
         detectedLazyLoading,
         detectedFavicon,
+        detectedMetaTags,
         detectedFormValidation
       } = analyzeWebsite(html, libraryRules);
       
@@ -116,6 +119,7 @@ const Dashboard = () => {
       setFavicon(detectedFavicon || { exists: false, icons: [] });
       setFormValidation(detectedFormValidation || { forms: [] });
       setSearched(true);
+      setMetaTags(detectedMetaTags || []);
   
       // Save analysis data to Supabase
       try {
@@ -127,7 +131,8 @@ const Dashboard = () => {
           detectedAriaLabels: detectedAriaLabels, 
           detectedLazyLoading: detectedLazyLoading,
           detectedFormValidation: detectedFormValidation,
-          osName: osName
+          osName: osName,
+          detectedMetaTags: detectedMetaTags
         };
   
         const response = await fetch('/.netlify/functions/save-report', {
@@ -177,6 +182,7 @@ const Dashboard = () => {
             lazyLoadedElements={lazyLoadedElements}
             favicon={favicon}
             formValidation={formValidation}
+            metaTags={metaTags}
           />
         )}
       </main>
