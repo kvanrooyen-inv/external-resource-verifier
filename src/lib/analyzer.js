@@ -13,14 +13,20 @@ export const analyzeWebsite = (html, libraryRules) => {
   const detectedLazyLoading = detectLazyLoading(html);
   const detectedFavicon = detectFavicon(html);
   const detectedFormValidation = detectFormValidation(html);
-  
+  const detectedMetaTags = detectMetaTags(html);
+  const detectedSemanticElements = detectSemanticHTML(html);
+  const detectedGridFlexbox = detectGridFlexbox(html);
+
   return {
     detectedLibraries,
     detectedAlerts,
     detectedAriaLabels,
     detectedLazyLoading,
     detectedFavicon,
-    detectedFormValidation
+    detectedFormValidation,
+    detectedMetaTags,
+    detectedSemanticElements,
+    detectedGridFlexbox
   };
 };
 
@@ -327,4 +333,356 @@ export const detectFormValidation = (html) => {
   }
   
   return formValidation;
+
+};
+
+/**
+ * Detect meta tags in HTML content
+ * @param {string} html - The HTML content
+ * @returns {Array} - Array of detected meta tags
+ */
+export const detectMetaTags = (html) => {
+  // Initialize empty array
+  const metaTags = [];
+  
+  const lines = html.split('\n');
+  
+  // Regex patterns for different types of meta tags
+  const metaTagRegex = /<meta[^>]*>/gi;
+  const nameAttrRegex = /name\s*=\s*["']([^"']*)["']/i;
+  const propertyAttrRegex = /property\s*=\s*["']([^"']*)["']/i;
+  const contentAttrRegex = /content\s*=\s*["']([^"']*)["']/i;
+  const charsetAttrRegex = /charset\s*=\s*["']([^"']*)["']/i;
+  const httpEquivAttrRegex = /http-equiv\s*=\s*["']([^"']*)["']/i;
+  
+  // Categorize meta tags for easy identification
+  const metaCategories = {
+    'viewport': 'Viewport',
+    'description': 'Description',
+    'keywords': 'Keywords',
+    'author': 'Author',
+    'robots': 'Robots',
+    'og:': 'Open Graph',
+    'twitter:': 'Twitter Card',
+    'charset': 'Character Set',
+    'http-equiv': 'HTTP-Equiv'
+  };
+  
+  lines.forEach((line, lineIndex) => {
+    // Find all meta tags in the current line
+    const metaMatches = [...line.matchAll(metaTagRegex)];
+    
+    if (metaMatches.length > 0) {
+      metaMatches.forEach(match => {
+        const metaTag = match[0];
+        
+        // Extract attributes
+        const nameMatch = metaTag.match(nameAttrRegex);
+        const propertyMatch = metaTag.match(propertyAttrRegex);
+        const contentMatch = metaTag.match(contentAttrRegex);
+        const charsetMatch = metaTag.match(charsetAttrRegex);
+        const httpEquivMatch = metaTag.match(httpEquivAttrRegex);
+        
+        let tagName = '';
+        let tagType = 'standard';
+        let tagContent = contentMatch ? contentMatch[1] : '';
+        
+        // Determine tag type and name
+        if (nameMatch) {
+          tagName = nameMatch[1];
+          
+          // Categorize based on common meta tag names
+          for (const [key, value] of Object.entries(metaCategories)) {
+            if (tagName.toLowerCase().includes(key.toLowerCase())) {
+              tagType = value;
+              break;
+            }
+          }
+        } else if (propertyMatch) {
+          tagName = propertyMatch[1];
+          
+          // Categorize based on property prefixes
+          for (const [key, value] of Object.entries(metaCategories)) {
+            if (tagName.toLowerCase().includes(key.toLowerCase())) {
+              tagType = value;
+              break;
+            }
+          }
+        } else if (charsetMatch) {
+          tagName = 'charset';
+          tagContent = charsetMatch[1];
+          tagType = 'Character Set';
+        } else if (httpEquivMatch) {
+          tagName = httpEquivMatch[1];
+          tagType = 'HTTP-Equiv';
+        }
+        
+        // Add to array
+        metaTags.push({
+          id: metaTags.length,
+          name: tagName || 'Unnamed Meta Tag',
+          type: tagType,
+          content: tagContent,
+          element: metaTag.trim(),
+          lineNumber: lineIndex + 1
+        });
+      });
+    }
+  });
+  
+  return metaTags;
+};
+
+/**
+ * Analyzes HTML content for semantic HTML elements
+ * @param {string} html - The HTML content to analyze
+ * @returns {Array} - Array of detected semantic HTML elements
+ */
+export function detectSemanticHTML(html) {
+  
+  if (!html || typeof html !== 'string') {
+    console.warn('No valid HTML provided for semantic analysis');
+    return [];
+  }
+
+  // List of semantic HTML tags to detect
+  const semanticTags = [
+    'article', 'aside', 'details', 'figcaption', 'figure', 
+    'footer', 'header', 'main', 'mark', 'nav', 
+    'section', 'summary', 'time', 'address', 'output',
+    'progress', 'meter', 'ruby', 'rt', 'rp'
+  ];
+
+  // Create a temporary DOM parser
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  
+  const semanticElements = [];
+  let elementId = 1;
+
+  // Function to get line number estimate (approximate based on index in HTML string)
+  const getLineNumber = (element) => {
+    try {
+      // Get the HTML representation of the element
+      const elementHtml = element.outerHTML;
+      // Find the position in the original HTML
+      const position = html.indexOf(elementHtml);
+      if (position === -1) return 'Unknown';
+      
+      // Count newlines up to this position
+      const upToPosition = html.substring(0, position);
+      const lineNumber = upToPosition.split('\n').length;
+      return lineNumber;
+    } catch (error) {
+      console.error('Error determining line number:', error);
+      return 'Unknown';
+    }
+  };
+
+  // Process each semantic tag type
+  semanticTags.forEach(tagName => {
+    const elements = doc.getElementsByTagName(tagName);
+    
+    Array.from(elements).forEach(element => {
+      // Get element attributes
+      const attributes = {};
+      Array.from(element.attributes).forEach(attr => {
+        attributes[attr.name] = attr.value;
+      });
+      
+      // Get text content, trimmed and limited
+      const content = element.textContent?.trim().substring(0, 100) || '';
+      
+      // Create a serialized version of just this element
+      const elementHTML = element.outerHTML;
+      
+      semanticElements.push({
+        id: elementId++,
+        tagName: element.tagName,
+        element: elementHTML,
+        attributes,
+        content,
+        lineNumber: getLineNumber(element)
+      });
+    });
+  });
+
+  return semanticElements;
+}
+
+// Utility functions for analyzing website content
+
+/**
+ * Detect CSS Grid and Flexbox usage in website content
+ * @param {string} html - The HTML content of the website
+ * @returns {Array} - Array of detected Grid and Flexbox usage
+ */
+export const detectGridFlexbox = (html) => {
+  const gridFlexboxItems = [];
+  
+  if (!html || typeof html !== 'string') {
+    console.warn('No valid HTML provided for Grid/Flexbox analysis');
+    return [];
+  }
+ 
+  // CSS properties to look for
+  const gridProperties = [
+    'display:\\s*grid',
+    'grid-template',
+    'grid-template-columns',
+    'grid-template-rows',
+    'grid-template-areas',
+    'grid-column',
+    'grid-row',
+    'grid-area',
+    'grid-gap',
+    'gap',
+    'grid-column-gap',
+    'grid-row-gap'
+  ];
+  
+  const flexboxProperties = [
+    'display:\\s*flex',
+    'flex-direction',
+    'flex-wrap',
+    'flex-flow',
+    'justify-content',
+    'align-items',
+    'align-content',
+    'flex-grow',
+    'flex-shrink',
+    'flex-basis',
+    'flex:'
+  ];
+
+  // Process inline styles in HTML tags
+  // This approach finds style attributes in HTML elements
+  let itemId = 1;
+  
+  // Detect inline styles
+  const styleAttrRegex = /<[^>]*style\s*=\s*["']([^"']*)["'][^>]*>/gi;
+  let match;
+  
+  while ((match = styleAttrRegex.exec(html)) !== null) {
+    const styleContent = match[1];
+    const fullElement = match[0].trim();
+    const lineNumber = getLineNumber(html, match.index);
+    const elementType = fullElement.match(/<([a-z][a-z0-9]*)/i)?.[1] || 'unknown';
+    
+    // Check for grid properties
+    const hasGrid = gridProperties.some(prop => {
+      const regex = new RegExp(prop, 'i');
+      return regex.test(styleContent);
+    });
+    
+    // Check for flexbox properties
+    const hasFlexbox = flexboxProperties.some(prop => {
+      const regex = new RegExp(prop, 'i');
+      return regex.test(styleContent);
+    });
+    
+    if (hasGrid || hasFlexbox) {
+      const type = hasGrid ? (hasFlexbox ? 'grid+flexbox' : 'grid') : 'flexbox';
+      
+      gridFlexboxItems.push({
+        id: itemId++,
+        type,
+        implementation: 'inline',
+        element: fullElement,
+        elementType,
+        lineNumber,
+        styles: styleContent,
+        name: `Inline ${type} on <${elementType}>`
+      });
+    }
+  }
+  
+  // Detect in <style> tags
+  const styleTagRegex = /<style[^>]*>([\s\S]*?)<\/style>/gi;
+  let styleMatch;
+  
+  while ((styleMatch = styleTagRegex.exec(html)) !== null) {
+    const styleContent = styleMatch[1];
+    const styleLineStart = getLineNumber(html, styleMatch.index);
+    
+    // Look for CSS rules with grid or flexbox properties
+    const cssRuleRegex = /([^{}]+)\{([^{}]*)\}/g;
+    let ruleMatch;
+    
+    while ((ruleMatch = cssRuleRegex.exec(styleContent)) !== null) {
+      const selector = ruleMatch[1].trim();
+      const declarations = ruleMatch[2];
+      
+      // Check for grid properties
+      const hasGrid = gridProperties.some(prop => {
+        const regex = new RegExp(prop, 'i');
+        return regex.test(declarations);
+      });
+      
+      // Check for flexbox properties
+      const hasFlexbox = flexboxProperties.some(prop => {
+        const regex = new RegExp(prop, 'i');
+        return regex.test(declarations);
+      });
+      
+      if (hasGrid || hasFlexbox) {
+        const type = hasGrid ? (hasFlexbox ? 'grid+flexbox' : 'grid') : 'flexbox';
+        
+        // Calculate approximate line number within the style block
+        const selectorPosition = styleContent.indexOf(ruleMatch[0]);
+        const selectorLines = styleContent.substring(0, selectorPosition).split('\n').length - 1;
+        const approxLineNumber = styleLineStart + selectorLines;
+        
+        gridFlexboxItems.push({
+          id: itemId++,
+          type,
+          implementation: 'internal-css',
+          selector,
+          styles: declarations,
+          lineNumber: approxLineNumber,
+          name: `${type.charAt(0).toUpperCase() + type.slice(1)} in <style> (${selector})`
+        });
+      }
+    }
+  }
+  
+  // Look for classes that might use grid or flexbox
+  // This is more speculative since we don't have access to external CSS
+  const classRegex = /<[^>]*class\s*=\s*["']([^"']*)["'][^>]*>/gi;
+  let classMatch;
+  
+  while ((classMatch = classRegex.exec(html)) !== null) {
+    const classesStr = classMatch[1];
+    const fullElement = classMatch[0].trim();
+    const lineNumber = getLineNumber(html, classMatch.index);
+    const elementType = fullElement.match(/<([a-z][a-z0-9]*)/i)?.[1] || 'unknown';
+    const classes = classesStr.split(/\s+/);
+    
+    // Look for common grid/flexbox naming patterns in classes
+    const gridClasses = classes.filter(cls => 
+      /grid|row|col-|column|area|template|gap/.test(cls.toLowerCase())
+    );
+    
+    const flexClasses = classes.filter(cls => 
+      /flex|justify|align|wrap|shrink|grow/.test(cls.toLowerCase())
+    );
+    
+    if (gridClasses.length > 0 || flexClasses.length > 0) {
+      const type = gridClasses.length > 0 ? (flexClasses.length > 0 ? 'grid+flexbox' : 'grid') : 'flexbox';
+      const relevantClasses = [...new Set([...gridClasses, ...flexClasses])].join(' ');
+      
+      gridFlexboxItems.push({
+        id: itemId++,
+        type,
+        implementation: 'class-based',
+        element: fullElement,
+        elementType,
+        classes: relevantClasses,
+        lineNumber,
+        name: `Potential ${type} classes on <${elementType}>`
+      });
+    }
+  }
+  
+  return gridFlexboxItems;
 };
