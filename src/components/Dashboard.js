@@ -26,6 +26,7 @@ const Dashboard = () => {
   const [headerPosition, setHeaderPosition] = useState("centered"); // 'centered' or 'top'
   const [metaTags, setMetaTags] = useState([]);
   const [semanticElements, setSemanticElements] = useState([]);
+  const [gridFlexboxItems, setGridFlexboxItems] = useState([]);
 
   const { theme, toggleTheme } = useContext(ThemeContext);
 
@@ -92,6 +93,7 @@ const Dashboard = () => {
     setFormValidation({ forms: [] });
     setMetaTags([]);
     setSemanticElements([]);
+    setGridFlexboxItems([]);
 
     if (!url.trim() || !isValidURL(url)) {
       setError("Please enter a valid URL.");
@@ -116,6 +118,7 @@ const Dashboard = () => {
         detectedMetaTags,
         detectedSemanticElements,
         detectedFormValidation,
+        detectedGridFlexbox
       } = analyzeWebsite(html, libraryRules);
 
       // Update state with all the analysis results
@@ -127,6 +130,7 @@ const Dashboard = () => {
       setFormValidation(detectedFormValidation || { forms: [] });
       setMetaTags(detectedMetaTags || []);
       setSemanticElements(detectedSemanticElements || []);
+      setGridFlexboxItems(detectedGridFlexbox || []);
       setSearched(true);
 
       // Save analysis data to Supabase
@@ -142,6 +146,7 @@ const Dashboard = () => {
           osName: osName,
           detectedMetaTags: detectedMetaTags,
           detectedSemanticElements: detectedSemanticElements || [],
+          detectedGridFlexbox: detectedGridFlexbox
         };
 
         const response = await fetch("/.netlify/functions/save-report", {
@@ -197,6 +202,7 @@ const Dashboard = () => {
             formValidation={formValidation}
             metaTags={metaTags}
             semanticElements={semanticElements}
+            gridFlexboxItems={gridFlexboxItems}
           />
         )}
       </main>

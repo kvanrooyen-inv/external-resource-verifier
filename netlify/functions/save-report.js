@@ -59,6 +59,9 @@ exports.handler = async (event) => {
       detected_semantic_elements: Array.isArray(data.detectedSemanticElements)
         ? data.detectedSemanticElements
         : [],
+        detected_grid_flexbox: Array.isArray(data.detectedGridFlexbox)
+        ? data.detectedGridFlexbox
+        : [],
       os_name: data.osName || "Unknown",
       created_at: new Date().toISOString(),
     };
@@ -88,6 +91,7 @@ exports.handler = async (event) => {
           ariaAttributes: recordData.detected_aria_attributes.length,
           metaTags: recordData.detected_meta_tags.length,
           semanticElements: recordData.detected_semantic_elements.length,
+          gridFlexboxItems: recordData.detected_grid_flexbox.length,
         },
       }),
     };

@@ -15,6 +15,7 @@ export const analyzeWebsite = (html, libraryRules) => {
   const detectedFormValidation = detectFormValidation(html);
   const detectedMetaTags = detectMetaTags(html);
   const detectedSemanticElements = detectSemanticHTML(html);
+  const detectedGridFlexbox = detectGridFlexbox(html);
 
   return {
     detectedLibraries,
@@ -24,7 +25,8 @@ export const analyzeWebsite = (html, libraryRules) => {
     detectedFavicon,
     detectedFormValidation,
     detectedMetaTags,
-    detectedSemanticElements
+    detectedSemanticElements,
+    detectedGridFlexbox
   };
 };
 
@@ -507,3 +509,180 @@ export function detectSemanticHTML(html) {
 
   return semanticElements;
 }
+
+// Utility functions for analyzing website content
+
+/**
+ * Detect CSS Grid and Flexbox usage in website content
+ * @param {string} html - The HTML content of the website
+ * @returns {Array} - Array of detected Grid and Flexbox usage
+ */
+export const detectGridFlexbox = (html) => {
+  const gridFlexboxItems = [];
+  
+  if (!html || typeof html !== 'string') {
+    console.warn('No valid HTML provided for Grid/Flexbox analysis');
+    return [];
+  }
+ 
+  // CSS properties to look for
+  const gridProperties = [
+    'display:\\s*grid',
+    'grid-template',
+    'grid-template-columns',
+    'grid-template-rows',
+    'grid-template-areas',
+    'grid-column',
+    'grid-row',
+    'grid-area',
+    'grid-gap',
+    'gap',
+    'grid-column-gap',
+    'grid-row-gap'
+  ];
+  
+  const flexboxProperties = [
+    'display:\\s*flex',
+    'flex-direction',
+    'flex-wrap',
+    'flex-flow',
+    'justify-content',
+    'align-items',
+    'align-content',
+    'flex-grow',
+    'flex-shrink',
+    'flex-basis',
+    'flex:'
+  ];
+
+  // Process inline styles in HTML tags
+  // This approach finds style attributes in HTML elements
+  let itemId = 1;
+  
+  // Detect inline styles
+  const styleAttrRegex = /<[^>]*style\s*=\s*["']([^"']*)["'][^>]*>/gi;
+  let match;
+  
+  while ((match = styleAttrRegex.exec(html)) !== null) {
+    const styleContent = match[1];
+    const fullElement = match[0].trim();
+    const lineNumber = getLineNumber(html, match.index);
+    const elementType = fullElement.match(/<([a-z][a-z0-9]*)/i)?.[1] || 'unknown';
+    
+    // Check for grid properties
+    const hasGrid = gridProperties.some(prop => {
+      const regex = new RegExp(prop, 'i');
+      return regex.test(styleContent);
+    });
+    
+    // Check for flexbox properties
+    const hasFlexbox = flexboxProperties.some(prop => {
+      const regex = new RegExp(prop, 'i');
+      return regex.test(styleContent);
+    });
+    
+    if (hasGrid || hasFlexbox) {
+      const type = hasGrid ? (hasFlexbox ? 'grid+flexbox' : 'grid') : 'flexbox';
+      
+      gridFlexboxItems.push({
+        id: itemId++,
+        type,
+        implementation: 'inline',
+        element: fullElement,
+        elementType,
+        lineNumber,
+        styles: styleContent,
+        name: `Inline ${type} on <${elementType}>`
+      });
+    }
+  }
+  
+  // Detect in <style> tags
+  const styleTagRegex = /<style[^>]*>([\s\S]*?)<\/style>/gi;
+  let styleMatch;
+  
+  while ((styleMatch = styleTagRegex.exec(html)) !== null) {
+    const styleContent = styleMatch[1];
+    const styleLineStart = getLineNumber(html, styleMatch.index);
+    
+    // Look for CSS rules with grid or flexbox properties
+    const cssRuleRegex = /([^{}]+)\{([^{}]*)\}/g;
+    let ruleMatch;
+    
+    while ((ruleMatch = cssRuleRegex.exec(styleContent)) !== null) {
+      const selector = ruleMatch[1].trim();
+      const declarations = ruleMatch[2];
+      
+      // Check for grid properties
+      const hasGrid = gridProperties.some(prop => {
+        const regex = new RegExp(prop, 'i');
+        return regex.test(declarations);
+      });
+      
+      // Check for flexbox properties
+      const hasFlexbox = flexboxProperties.some(prop => {
+        const regex = new RegExp(prop, 'i');
+        return regex.test(declarations);
+      });
+      
+      if (hasGrid || hasFlexbox) {
+        const type = hasGrid ? (hasFlexbox ? 'grid+flexbox' : 'grid') : 'flexbox';
+        
+        // Calculate approximate line number within the style block
+        const selectorPosition = styleContent.indexOf(ruleMatch[0]);
+        const selectorLines = styleContent.substring(0, selectorPosition).split('\n').length - 1;
+        const approxLineNumber = styleLineStart + selectorLines;
+        
+        gridFlexboxItems.push({
+          id: itemId++,
+          type,
+          implementation: 'internal-css',
+          selector,
+          styles: declarations,
+          lineNumber: approxLineNumber,
+          name: `${type.charAt(0).toUpperCase() + type.slice(1)} in <style> (${selector})`
+        });
+      }
+    }
+  }
+  
+  // Look for classes that might use grid or flexbox
+  // This is more speculative since we don't have access to external CSS
+  const classRegex = /<[^>]*class\s*=\s*["']([^"']*)["'][^>]*>/gi;
+  let classMatch;
+  
+  while ((classMatch = classRegex.exec(html)) !== null) {
+    const classesStr = classMatch[1];
+    const fullElement = classMatch[0].trim();
+    const lineNumber = getLineNumber(html, classMatch.index);
+    const elementType = fullElement.match(/<([a-z][a-z0-9]*)/i)?.[1] || 'unknown';
+    const classes = classesStr.split(/\s+/);
+    
+    // Look for common grid/flexbox naming patterns in classes
+    const gridClasses = classes.filter(cls => 
+      /grid|row|col-|column|area|template|gap/.test(cls.toLowerCase())
+    );
+    
+    const flexClasses = classes.filter(cls => 
+      /flex|justify|align|wrap|shrink|grow/.test(cls.toLowerCase())
+    );
+    
+    if (gridClasses.length > 0 || flexClasses.length > 0) {
+      const type = gridClasses.length > 0 ? (flexClasses.length > 0 ? 'grid+flexbox' : 'grid') : 'flexbox';
+      const relevantClasses = [...new Set([...gridClasses, ...flexClasses])].join(' ');
+      
+      gridFlexboxItems.push({
+        id: itemId++,
+        type,
+        implementation: 'class-based',
+        element: fullElement,
+        elementType,
+        classes: relevantClasses,
+        lineNumber,
+        name: `Potential ${type} classes on <${elementType}>`
+      });
+    }
+  }
+  
+  return gridFlexboxItems;
+};

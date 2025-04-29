@@ -8,6 +8,7 @@ import FormValidationCard from "./FormValidationCard";
 import EmptyState from "./EmptyState";
 import MetaTagCard from "./MetaTagsCard";
 import SemanticHTMLCard from "./SemanticHTMLCard";
+import GridFlexboxCard from "./GridFlexboxCard";
 
 const ResultsContainer = ({
   libraries,
@@ -17,9 +18,9 @@ const ResultsContainer = ({
   favicon,
   formValidation,
   metaTags,
-  semanticElements
+  semanticElements,
+  gridFlexboxItems
 }) => {
- 
   const hasResults =
     libraries.length > 0 ||
     alerts.length > 0 ||
@@ -28,6 +29,7 @@ const ResultsContainer = ({
     (favicon && favicon.exists) ||
     (formValidation && formValidation.forms.length > 0) ||
     metaTags.length > 0 ||
+    gridFlexboxItems.length > 0 ||
     (semanticElements && semanticElements.length > 0);
 
   if (!hasResults) {
@@ -67,9 +69,12 @@ const ResultsContainer = ({
 
       {/* Semantic HTML Section */}
       {semanticElements && semanticElements.length > 0 && (
-        <SemanticHTMLCard 
-          semanticElements={semanticElements} 
-        />
+        <SemanticHTMLCard semanticElements={semanticElements} />
+      )}
+
+      {/* CSS Grid & Flexboz Section */}
+      {gridFlexboxItems && gridFlexboxItems.length > 0 && (
+        <GridFlexboxCard gridFlexboxItems={gridFlexboxItems} />
       )}
     </div>
   );
