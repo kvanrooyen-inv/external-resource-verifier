@@ -34,34 +34,19 @@ exports.handler = async (event) => {
       };
     }
 
-    // Log data structure for debugging
-    console.log("Processing data structure:", Object.keys(data));
-    console.log(
-      "Semantic elements count:",
-      data.detectedSemanticElements?.length || 0
-    );
-    console.log("Semantic score:", data.semanticScore);
-
-    // Update the record data object in save-report.js
+    // Update the record data object with safer data handling
     const recordData = {
       url: data.url,
-      detected_libraries: data.detectedLibraries || [],
-      detected_alerts: data.detectedAlerts || [],
-      detected_lazy_loading: data.detectedLazyLoading || [],
-      detected_form_validation:
-        data.detectedFormValidation && data.detectedFormValidation.forms
-          ? data.detectedFormValidation.forms
-          : [],
-      detected_aria_attributes: data.detectedAriaLabels || [],
-      detected_meta_tags: Array.isArray(data.detectedMetaTags)
-        ? data.detectedMetaTags
+      detected_libraries: Array.isArray(data.detectedLibraries) ? data.detectedLibraries : [],
+      detected_alerts: Array.isArray(data.detectedAlerts) ? data.detectedAlerts : [],
+      detected_lazy_loading: Array.isArray(data.detectedLazyLoading) ? data.detectedLazyLoading : [],
+      detected_form_validation: data.detectedFormValidation && Array.isArray(data.detectedFormValidation.forms) 
+        ? data.detectedFormValidation.forms 
         : [],
-      detected_semantic_elements: Array.isArray(data.detectedSemanticElements)
-        ? data.detectedSemanticElements
-        : [],
-        detected_grid_flexbox: Array.isArray(data.detectedGridFlexbox)
-        ? data.detectedGridFlexbox
-        : [],
+      detected_aria_attributes: Array.isArray(data.detectedAriaLabels) ? data.detectedAriaLabels : [],
+      detected_meta_tags: Array.isArray(data.detectedMetaTags) ? data.detectedMetaTags : [],
+      detected_semantic_elements: Array.isArray(data.detectedSemanticElements) ? data.detectedSemanticElements : [],
+      detected_grid_flexbox: Array.isArray(data.detectedGridFlexbox) ? data.detectedGridFlexbox : [],
       os_name: data.osName || "Unknown",
       created_at: new Date().toISOString(),
     };
@@ -74,7 +59,16 @@ exports.handler = async (event) => {
 
     if (error) {
       console.error("Supabase error:", error);
-      throw error;
+      // Return the specific error information to the client
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ 
+          error: "Database error", 
+          details: error.message,
+          code: error.code
+        }),
+      };
     }
 
     return {
@@ -96,11 +90,14 @@ exports.handler = async (event) => {
       }),
     };
   } catch (error) {
-    console.error("Error saving data:", error);
+    console.error("Error processing or saving data:", error);
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: "Failed to save analysis data" }),
+      body: JSON.stringify({ 
+        error: "Failed to save analysis data",
+        details: error.message 
+      }),
     };
   }
 };
