@@ -23,15 +23,47 @@ exports.handler = async (event) => {
   };
 
   try {
-    // Get all records from site_stats table
-    const { data, error } = await supabase.from("site_stats").select("*");
+    // First, get the total count of records
+    const { count: totalCount, error: countError } = await supabase
+      .from("site_stats")
+      .select("*", { count: "exact", head: true });
 
-    if (error) {
-      console.error("Supabase error:", error);
-      throw error;
+    if (countError) {
+      console.error("Error getting count:", countError);
+      throw countError;
     }
 
-    if (!data || data.length === 0) {
+    console.log(`Total records in database: ${totalCount}`);
+
+    // Now get records with a larger limit for analysis
+    // Use paging for very large datasets to avoid timeouts
+    const PAGE_SIZE = 1000;
+    let allData = [];
+    let page = 0;
+    
+    // Only fetch data if we have records
+    if (totalCount > 0) {
+      while (page * PAGE_SIZE < totalCount && page < 10) { // Limit to 10 pages to prevent infinite loops
+        const { data: pageData, error: pageError } = await supabase
+          .from("site_stats")
+          .select("*")
+          .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+        
+        if (pageError) {
+          console.error(`Error fetching page ${page}:`, pageError);
+          throw pageError;
+        }
+        
+        if (pageData && pageData.length > 0) {
+          allData = [...allData, ...pageData];
+          page++;
+        } else {
+          break;
+        }
+      }
+    }
+
+    if (allData.length === 0) {
       return {
         statusCode: 404,
         headers,
@@ -39,8 +71,15 @@ exports.handler = async (event) => {
       };
     }
 
+    console.log(`Fetched ${allData.length} records for analysis`);
+
     // Process the data to extract statistics
-    const stats = processDataForStats(data);
+    const stats = processDataForStats(allData);
+    
+    // Add the real total count from the database
+    stats.totalSites = totalCount;
+    stats.analyzedSites = allData.length;
+    stats.lastUpdated = new Date().toISOString();
 
     return {
       statusCode: 200,
@@ -134,6 +173,7 @@ function processDataForStats(data) {
 
   return {
     totalSites,
+    analyzedSites: totalSites, // This will be overridden with actual count
     topLibraries,
     alertStats: {
       sitesWithAlerts,
