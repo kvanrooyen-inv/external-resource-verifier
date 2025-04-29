@@ -7,6 +7,7 @@ import FaviconCard from "./FaviconCard";
 import FormValidationCard from "./FormValidationCard";
 import EmptyState from "./EmptyState";
 import MetaTagCard from "./MetaTagsCard";
+import SemanticHTMLCard from "./SemanticHTMLCard";
 
 const ResultsContainer = ({
   libraries,
@@ -16,7 +17,13 @@ const ResultsContainer = ({
   favicon,
   formValidation,
   metaTags,
+  semanticElements,
+  semanticScore
 }) => {
+  // Debugging purposes.
+  console.log("ResultsContainer rendering with semantic elements:", semanticElements?.length);
+  console.log("Semantic score:", semanticScore);
+  
   const hasResults =
     libraries.length > 0 ||
     alerts.length > 0 ||
@@ -24,7 +31,8 @@ const ResultsContainer = ({
     (lazyLoadedElements && lazyLoadedElements.length > 0) ||
     (favicon && favicon.exists) ||
     (formValidation && formValidation.forms.length > 0) ||
-    metaTags.length > 0;
+    metaTags.length > 0 ||
+    (semanticElements && semanticElements.length > 0);
 
   if (!hasResults) {
     return <EmptyState />;
@@ -60,6 +68,14 @@ const ResultsContainer = ({
 
       {/* Meta Tags Section */}
       {metaTags && metaTags.length > 0 && <MetaTagCard metaTags={metaTags} />}
+
+      {/* Semantic HTML Section */}
+      {semanticElements && semanticElements.length > 0 && (
+        <SemanticHTMLCard 
+          semanticElements={semanticElements} 
+          semanticScore={semanticScore}
+        />
+      )}
     </div>
   );
 };

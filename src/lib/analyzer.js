@@ -14,7 +14,9 @@ export const analyzeWebsite = (html, libraryRules) => {
   const detectedFavicon = detectFavicon(html);
   const detectedFormValidation = detectFormValidation(html);
   const detectedMetaTags = detectMetaTags(html);
-  
+  const detectedSemanticElements = detectSemanticHTML(html);
+  const semanticScore = calculateSemanticScore(detectedSemanticElements, html);
+
   return {
     detectedLibraries,
     detectedAlerts,
@@ -22,7 +24,9 @@ export const analyzeWebsite = (html, libraryRules) => {
     detectedLazyLoading,
     detectedFavicon,
     detectedFormValidation,
-    detectedMetaTags
+    detectedMetaTags,
+    detectedSemanticElements,
+    semanticScore
   };
 };
 
@@ -426,8 +430,139 @@ export const detectMetaTags = (html) => {
     }
   });
   
-  // Add debug logs
-  console.log(`Detected ${metaTags.length} meta tags`);
-  
   return metaTags;
 };
+
+/**
+ * Analyzes HTML content for semantic HTML elements
+ * @param {string} html - The HTML content to analyze
+ * @returns {Array} - Array of detected semantic HTML elements
+ */
+export function detectSemanticHTML(html) {
+  console.log('Analyzing HTML for semantic elements...');
+  
+  if (!html || typeof html !== 'string') {
+    console.warn('No valid HTML provided for semantic analysis');
+    return [];
+  }
+
+  // List of semantic HTML tags to detect
+  const semanticTags = [
+    'article', 'aside', 'details', 'figcaption', 'figure', 
+    'footer', 'header', 'main', 'mark', 'nav', 
+    'section', 'summary', 'time', 'address', 'output',
+    'progress', 'meter', 'ruby', 'rt', 'rp'
+  ];
+
+  // Create a temporary DOM parser
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  
+  const semanticElements = [];
+  let elementId = 1;
+
+  // Function to get line number estimate (approximate based on index in HTML string)
+  const getLineNumber = (element) => {
+    try {
+      // Get the HTML representation of the element
+      const elementHtml = element.outerHTML;
+      // Find the position in the original HTML
+      const position = html.indexOf(elementHtml);
+      if (position === -1) return 'Unknown';
+      
+      // Count newlines up to this position
+      const upToPosition = html.substring(0, position);
+      const lineNumber = upToPosition.split('\n').length;
+      return lineNumber;
+    } catch (error) {
+      console.error('Error determining line number:', error);
+      return 'Unknown';
+    }
+  };
+
+  // Process each semantic tag type
+  semanticTags.forEach(tagName => {
+    const elements = doc.getElementsByTagName(tagName);
+    
+    Array.from(elements).forEach(element => {
+      // Get element attributes
+      const attributes = {};
+      Array.from(element.attributes).forEach(attr => {
+        attributes[attr.name] = attr.value;
+      });
+      
+      // Get text content, trimmed and limited
+      const content = element.textContent?.trim().substring(0, 100) || '';
+      
+      // Create a serialized version of just this element
+      const elementHTML = element.outerHTML;
+      
+      semanticElements.push({
+        id: elementId++,
+        tagName: element.tagName,
+        element: elementHTML,
+        attributes,
+        content,
+        lineNumber: getLineNumber(element)
+      });
+    });
+  });
+
+  console.log(`Found ${semanticElements.length} semantic HTML elements`);
+  return semanticElements;
+}
+
+/**
+ * Calculate semantic HTML usage score (0-100)
+ * @param {Array} semanticElements - Detected semantic elements
+ * @param {string} html - Original HTML content
+ * @returns {Object} - Score and analysis
+ */
+export function calculateSemanticScore(semanticElements, html) {
+  if (!html || !semanticElements) {
+    return { score: 0, analysis: 'No data available' };
+  }
+
+  // Create a DOM parser to count all elements
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  
+  // Count total elements (excluding script, style, meta, link)
+  const allElements = doc.getElementsByTagName('*');
+  const nonScriptElements = Array.from(allElements).filter(el => 
+    !['SCRIPT', 'STYLE', 'META', 'LINK', 'HEAD'].includes(el.tagName)
+  );
+  
+  const totalElements = nonScriptElements.length;
+  const semanticCount = semanticElements.length;
+  
+  // Calculate semantic density
+  const density = totalElements > 0 ? (semanticCount / totalElements) : 0;
+  
+  // Scale to 0-100 score with a curve that rewards even small semantic usage
+  // This formula gives a score of 50 for 10% semantic elements, 75 for 20%, 90 for 30%
+  const score = Math.min(100, Math.round(100 * (1 - Math.exp(-5 * density))));
+  
+  // Generate analysis text
+  let analysis;
+  if (score < 25) {
+    analysis = 'Poor semantic HTML usage. Consider adding more semantic elements.';
+  } else if (score < 50) {
+    analysis = 'Basic semantic HTML usage. Room for improvement.';
+  } else if (score < 75) {
+    analysis = 'Good semantic HTML usage. Well structured.';
+  } else {
+    analysis = 'Excellent semantic HTML usage! Very well structured document.';
+  }
+  
+  console.log(`Semantic HTML Score: ${score}/100 (${semanticCount} semantic elements out of ${totalElements} total)`);
+  
+  return {
+    score,
+    analysis,
+    elementCount: {
+      semantic: semanticCount,
+      total: totalElements
+    }
+  };
+}
