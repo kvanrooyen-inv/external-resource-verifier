@@ -26,7 +26,6 @@ const Dashboard = () => {
   const [headerPosition, setHeaderPosition] = useState("centered"); // 'centered' or 'top'
   const [metaTags, setMetaTags] = useState([]);
   const [semanticElements, setSemanticElements] = useState([]);
-  const [semanticScore, setSemanticScore] = useState(null);
 
   const { theme, toggleTheme } = useContext(ThemeContext);
 
@@ -93,7 +92,6 @@ const Dashboard = () => {
     setFormValidation({ forms: [] });
     setMetaTags([]);
     setSemanticElements([]);
-    setSemanticScore(null);
 
     if (!url.trim() || !isValidURL(url)) {
       setError("Please enter a valid URL.");
@@ -109,8 +107,6 @@ const Dashboard = () => {
       const html = await fetchUrlContent(url);
 
       // Process the HTML content using your analyzer
-      // Process the HTML content using your analyzer
-      console.log("Starting analysis...");
       const {
         detectedLibraries,
         detectedAlerts,
@@ -120,10 +116,7 @@ const Dashboard = () => {
         detectedMetaTags,
         detectedSemanticElements,
         detectedFormValidation,
-        semanticScore,
       } = analyzeWebsite(html, libraryRules);
-
-      console.log("Analysis complete, updating state...");
 
       // Update state with all the analysis results
       setLibraries(detectedLibraries || []);
@@ -134,13 +127,8 @@ const Dashboard = () => {
       setFormValidation(detectedFormValidation || { forms: [] });
       setMetaTags(detectedMetaTags || []);
       setSemanticElements(detectedSemanticElements || []);
-      setSemanticScore(semanticScore || null);
       setSearched(true);
 
-      console.log(
-        `Found ${detectedSemanticElements?.length || 0} semantic elements`
-      );
-      console.log("Semantic score:", semanticScore);
       // Save analysis data to Supabase
       try {
         const osName = navigator.platform || "Unknown";
@@ -209,7 +197,6 @@ const Dashboard = () => {
             formValidation={formValidation}
             metaTags={metaTags}
             semanticElements={semanticElements}
-            semanticScore={semanticScore}
           />
         )}
       </main>

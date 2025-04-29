@@ -17,13 +17,9 @@ const ResultsContainer = ({
   favicon,
   formValidation,
   metaTags,
-  semanticElements,
-  semanticScore
+  semanticElements
 }) => {
-  // Debugging purposes.
-  console.log("ResultsContainer rendering with semantic elements:", semanticElements?.length);
-  console.log("Semantic score:", semanticScore);
-  
+ 
   const hasResults =
     libraries.length > 0 ||
     alerts.length > 0 ||
@@ -73,7 +69,6 @@ const ResultsContainer = ({
       {semanticElements && semanticElements.length > 0 && (
         <SemanticHTMLCard 
           semanticElements={semanticElements} 
-          semanticScore={semanticScore}
         />
       )}
     </div>

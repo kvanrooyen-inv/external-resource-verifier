@@ -15,7 +15,6 @@ export const analyzeWebsite = (html, libraryRules) => {
   const detectedFormValidation = detectFormValidation(html);
   const detectedMetaTags = detectMetaTags(html);
   const detectedSemanticElements = detectSemanticHTML(html);
-  const semanticScore = calculateSemanticScore(detectedSemanticElements, html);
 
   return {
     detectedLibraries,
@@ -25,8 +24,7 @@ export const analyzeWebsite = (html, libraryRules) => {
     detectedFavicon,
     detectedFormValidation,
     detectedMetaTags,
-    detectedSemanticElements,
-    semanticScore
+    detectedSemanticElements
   };
 };
 
@@ -439,7 +437,6 @@ export const detectMetaTags = (html) => {
  * @returns {Array} - Array of detected semantic HTML elements
  */
 export function detectSemanticHTML(html) {
-  console.log('Analyzing HTML for semantic elements...');
   
   if (!html || typeof html !== 'string') {
     console.warn('No valid HTML provided for semantic analysis');
@@ -508,61 +505,5 @@ export function detectSemanticHTML(html) {
     });
   });
 
-  console.log(`Found ${semanticElements.length} semantic HTML elements`);
   return semanticElements;
-}
-
-/**
- * Calculate semantic HTML usage score (0-100)
- * @param {Array} semanticElements - Detected semantic elements
- * @param {string} html - Original HTML content
- * @returns {Object} - Score and analysis
- */
-export function calculateSemanticScore(semanticElements, html) {
-  if (!html || !semanticElements) {
-    return { score: 0, analysis: 'No data available' };
-  }
-
-  // Create a DOM parser to count all elements
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, 'text/html');
-  
-  // Count total elements (excluding script, style, meta, link)
-  const allElements = doc.getElementsByTagName('*');
-  const nonScriptElements = Array.from(allElements).filter(el => 
-    !['SCRIPT', 'STYLE', 'META', 'LINK', 'HEAD'].includes(el.tagName)
-  );
-  
-  const totalElements = nonScriptElements.length;
-  const semanticCount = semanticElements.length;
-  
-  // Calculate semantic density
-  const density = totalElements > 0 ? (semanticCount / totalElements) : 0;
-  
-  // Scale to 0-100 score with a curve that rewards even small semantic usage
-  // This formula gives a score of 50 for 10% semantic elements, 75 for 20%, 90 for 30%
-  const score = Math.min(100, Math.round(100 * (1 - Math.exp(-5 * density))));
-  
-  // Generate analysis text
-  let analysis;
-  if (score < 25) {
-    analysis = 'Poor semantic HTML usage. Consider adding more semantic elements.';
-  } else if (score < 50) {
-    analysis = 'Basic semantic HTML usage. Room for improvement.';
-  } else if (score < 75) {
-    analysis = 'Good semantic HTML usage. Well structured.';
-  } else {
-    analysis = 'Excellent semantic HTML usage! Very well structured document.';
-  }
-  
-  console.log(`Semantic HTML Score: ${score}/100 (${semanticCount} semantic elements out of ${totalElements} total)`);
-  
-  return {
-    score,
-    analysis,
-    elementCount: {
-      semantic: semanticCount,
-      total: totalElements
-    }
-  };
 }
