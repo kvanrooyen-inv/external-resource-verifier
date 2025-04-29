@@ -182,7 +182,7 @@ const GridFlexboxItem = ({ item }) => {
             <span className="font-medium">{item.selector}</span>
           </div>
           <div>
-              <span className="text-xs text-[#9ece6a] dark:text-[#9ece6a]">
+              <span className="text-xs text-[#2e5916] dark:text-[#9ece6a]">
                 {item.styles}
               </span>
             </div>
