@@ -53,7 +53,7 @@ And many web features, including JavaScript alerts, ARIA attributes, form valida
 - **Time Efficiency**: Verify implementations in seconds, not minutes
 - **No Technical Knowledge Required**: Clear results without coding expertise
 - **Comprehensive Analysis**: Detects multiple aspects of web implementation
-- 
+
 ## Contributing
 
 We welcome contributions from technical and non-technical team members alike! Here's how you can help:
