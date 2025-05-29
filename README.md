@@ -67,5 +67,5 @@ See our [Contributing Guidelines](Contributing-Guidelines.md) for detailed instr
 
 ## More Information
 
-- [Project Wiki](Home.md): Additional documentation and guides
+- [Project Wiki](https://codeberg.org/kvanrooyen-inv/external-resource-verifier/wiki): Additional documentation and guides
 - [Demo Video](https://drive.google.com/file/d/1yHUEvEd16IU-M6A0sk6MbngkRdSWj7lx/view?usp=drive_link)
