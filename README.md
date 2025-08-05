@@ -1,6 +1,6 @@
 # External Resource Verifier
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/3164880b-a0db-4291-acba-530ec5c4b239/deploy-status)](https://app.netlify.com/sites/external-resource-checker/deploys) [![Website shields.io](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](https://external-resource-checker.netlify.app/) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/kvanrooyen-inv/external-resource-verifier/main)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/3164880b-a0db-4291-acba-530ec5c4b239/deploy-status)](https://app.netlify.com/sites/external-resource-checker/deploys) [![Website shields.io](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](https://external-resource-checker.netlify.app/)
 
 An intuitive web tool that helps trainers analyze websites and verify external resource implementation without any coding knowledge.
 
@@ -17,7 +17,7 @@ External Resource Verifier (ERC) streamlines the review process by allowing non-
 - **SEO Elements**: Examines metadata and favicon implementations
 - **Modern CSS**: Detects Grid and Flexbox usage
 
-[View complete feature list →](Features-&-Capabilities.md)
+[View complete feature list →](https://codeberg.org/kvanrooyen-inv/external-resource-verifier/wiki/Features-&-Capabilities)
 
 ## How to Use
 
@@ -63,7 +63,7 @@ We welcome contributions from technical and non-technical team members alike! He
 - **Feature Suggestions**: Recommend new checks or improvements
 - **Code Contributions**: Add new detection features or fix bugs
 
-See our [Contributing Guidelines](Contributing-Guidelines.md) for detailed instructions.
+See our [Contributing Guidelines](https://codeberg.org/kvanrooyen-inv/external-resource-verifier/wiki/Contributing-Guidelines) for detailed instructions.
 
 ## More Information
 
